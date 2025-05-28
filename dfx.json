@@ -1,0 +1,16 @@
+{
+  "canisters": {
+    "micro_tareas_backend": {
+      "main": "src/micro_tareas_backend/main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
