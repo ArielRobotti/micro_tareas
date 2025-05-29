@@ -1,14 +1,27 @@
 {
   "canisters": {
-    "micro_tareas_backend": {
-      "main": "src/micro_tareas_backend/main.mo",
-      "type": "motoko"
+    "backend": {
+      "main": "src/backend/main.mo",
+      "type": "motoko",
+      "declarations": {
+        "output": "./src/frontend/src/declarations/backend"
+      }
     }
+  },
+  "frontend": {
+    "source": [
+      "src/frontend/dist"
+    ],
+    "type": "assets"
+  },
+  "internet_identity": {
+    "type": "pull",
+    "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
   },
   "defaults": {
     "build": {
       "args": "",
-      "packtool": ""
+      "packtool": "mops sources"
     }
   },
   "output_env_file": ".env",
