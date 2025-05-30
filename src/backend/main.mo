@@ -47,7 +47,7 @@ actor {
     };
   };
 
-  public shared query ({ caller }) func singIn() : async LoginResult {
+  public shared query ({ caller }) func signIn() : async LoginResult {
     switch (Map.get<Principal, User>(users, phash, caller)) {
       case null { #Err("User not found") };
       case (?user) {
@@ -81,6 +81,20 @@ actor {
     #Ok(updatedUser);
   };
 
+  public shared ({ caller }) func enterCodeVerification(code: Text): async Bool {
+    switch (Map.get<Principal, User>(users, phash, caller)){
+      case null false;
+      case (?user) {
+        if(verifyCode(caller, code)) {
+          ignore Map.put<Principal, User>(users, phash, caller, { user with verified = true });
+          true
+        } else {
+          false
+        }
+      }
+    }
+  };
+
   ///////////////// Crud Tareas //////////////////
 
   public shared ({ caller }) func createTask(data : TaskDataInit) : async {
@@ -94,18 +108,22 @@ actor {
         user;
       };
     };
+    let { description; keywords; rewardRange; title; assets} = data;
 
     lastTaskId += 1;
-    let newTask : Task = {
-      data with
-      finalAmount = null;
-      id = lastTaskId;
+
+    let newTask: Task = {
+      Types.defaultTask() with
       owner = caller;
+      id = lastTaskId;
       createdAt = now();
-      status = #ToDo;
-      bids = Map.new<Principal, Types.Offer>();
-      assignedTo = null;
+      description;
+      keywords;
+      rewardRange;
+      title;
+      assets;
     };
+
     ignore Map.put<Nat, Task>(activeTasks, nhash, lastTaskId, newTask);
 
     let updatedUser: User = {
@@ -141,17 +159,23 @@ actor {
   };
 
   public shared query func expandTask(id : Nat) : async ?Types.TaskExpand {
-    Map.get<Nat, Task>(activeTasks, nhash, id);
+    switch (Map.get<Nat, Task>(activeTasks, nhash, id)) {
+      case null null;
+      case ( ?task ) { ?{task with bidsCounter = Map.size(task.bids)} };
+    };
   };
 
-  public shared ({ caller }) func updateTask({id : Nat; data: Types.UpdatableDataTask}) : async { #Ok; #Err } {
+  public shared ({ caller }) func updateTask({id : Nat; data: Types.UpdatableDataTask}) : async { #Ok; #Err: Text } {
     let task = Map.get<Nat, Task>(activeTasks, nhash, id);
     let {title; description; rewardRange} = data;
     switch task {
-      case null { return #Err };
+      case null { return #Err("Task Id not found") };
       case (?task) {
-        if (task.owner != caller or task.assignedTo != null or task.bids.size() > 0) {
-          return #Err;
+        if (task.owner != caller or task.assignedTo != null) {
+          return #Err("Caller is not owner");
+        };
+        if (Map.size(task.bids) > 0){
+          return #Err("Task with pending bids cannot be updated");
         };
         let updatedTask: Task = {
           task with
@@ -188,14 +212,15 @@ actor {
       case null { return #Err("Caller is not User") };
       case (?user) { user }; 
     };
-    if(not user.verified) {
-      return #Err("User is not verified")
-    };
+
+    if(not user.verified) { return #Err("User is not verified") };
 
     let task: Task = switch (Map.get<Nat ,Task>(activeTasks, nhash, taskId)) {
       case null { return #Err("Task does not exist") };
       case (?task) { task };
     };
+
+    if (caller == task.owner) { return #Err("Cannot apply for own task") };
 
     if (task.assignedTo != null) { 
       return #Err("Task is already assigned") 
@@ -208,6 +233,15 @@ actor {
     #Ok;
   };
 
+  public shared query ({ caller }) func getBids(taskId: Nat): async [(Principal, Types.Offer)]{
+    switch (Map.get<Nat, Task>(activeTasks, nhash, taskId)) {
+      case null { return [] };
+      case ( ?task ) {
+        assert(caller == task.owner);
+        Map.toArray<Principal, Types.Offer>(task.bids)
+      }
+    }
+  };
 
   public shared ({ caller }) func acceptOffer(taskId: Nat, user: Principal): async { #Ok; #Err: Text } {
 
@@ -229,7 +263,8 @@ actor {
         let updatedTask: Task = {
           task with
           assignedTo = ?user;
-          finalAmount = ?(offer.amount)
+          finalAmount = ?(offer.amount);
+          start = ?now();
         };
         ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, updatedTask);
         return #Ok
@@ -239,6 +274,10 @@ actor {
 
 
   ///////////// private functions ///////////////
+
+  func verifyCode(u: Principal, code: Text): Bool {
+    return true
+  };
 
   func getNotifications(p : Principal) : [Types.Notification] {
     switch (Map.get<Principal, [Types.Notification]>(notifications, phash, p)) {
