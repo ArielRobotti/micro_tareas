@@ -1,5 +1,5 @@
 import Principal "mo:base/Principal";
-
+import Map "mo:map/Map";
 module {
 
     type Account = {owner: Principal; subaccount: ?Blob };
@@ -12,6 +12,7 @@ module {
         verified: Bool;
         score: Nat;
         walletAccount: ?Account;
+        tasks: [Nat];
     };
 
     public type UserUpdatableData = {
@@ -29,6 +30,7 @@ module {
             verified = false;
             score = 0;
             walletAccount = null;
+            tasks =  [];
         }
     };
 
@@ -60,17 +62,51 @@ module {
     public type TaskStatus = {
         #ToDo;
         #InProgress;
+        #Cancelled;
         #Done;
     };
+
+    public type TaskDataInit = {
+        title: Text;
+        description: Text;
+        kewwords: Text;
+        rewardRange: (Nat, Nat);
+        assets: [{mimeTypes: Text; data:Blob}];
+    };
    
-    public type Task = {
-        id: Nat;
+    public type Offer = {
+        amount: Nat;
+        date: Int;
+
+    };
+
+    public type TaskExpand = TaskDataInit and {
+        id: Nat;  
         owner: Principal;
         createdAt: Int;
-        title: Text;
-        desciption: Text;
         status: TaskStatus;
-        asignedTo: ?Principal;
-        reward: Nat;
+        assignedTo: ?Principal;
+    };
+
+    public type TaskPreview = {
+        id: Nat;
+        owner: Principal;
+        title: Text;
+        description: Text;
+        rewardRange: (Nat, Nat);
+        createdAt: Int;
+        bidsCounter: Nat;
+    };
+
+    public type Task = TaskExpand and {
+        bids: Map.Map<Principal, Offer>;
+        finalAmount: ?Nat;
+    };
+
+    public type UpdatableDataTask = {
+        title: Text;
+        description: Text;
+        rewardRange: (Nat, Nat);
     }
+
 }
