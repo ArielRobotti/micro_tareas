@@ -5,7 +5,8 @@ import Principal "mo:base/Principal";
 import { now } "mo:base/Time";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
-actor {
+import Random "mo:random/Rand"
+shared ({caller = DEPLOYER}) actor class() {
 
   type User = Types.User;
   type UserUpdatableData = Types.UserUpdatableData;
@@ -15,13 +16,40 @@ actor {
   type TaskPreview = Types.TaskPreview;
 
   stable let users = Map.new<Principal, User>();
+  let verificationCodes = Map.new<Principal, Nat>();
   stable let notifications = Map.new<Principal, [Types.Notification]>();
   stable let msgs = Map.new<Principal, [Types.Msg]>();
   stable let activeTasks = Map.new<Nat, Types.Task>();
   stable let archivedTasks = Map.new<Nat, Types.Task>();
+  stable let certificates = Map.new<Principal, [Types.Certificate]>();
+  stable var admins: [Principal] = [DEPLOYER];
+
+  let rand = Random.Rand();
+
+  ////////////////// Admin funciotns ///////////////////
+
+  public shared ({ caller }) func addAdmin(p: Principal): async {#Ok; #Err} {
+    assert(isAdmin(caller));
+    if (not isAdmin(p)){
+      admins := Array.tabulate<Principal>(
+        admins.size() + 1,
+        func a = if(a < admins.size()) {admins[a]} else {p}
+      );
+      return #Ok
+    };
+    #Err
+  };
+
+  func isAdmin(p: Principal): Bool {
+    for(a in admins.vals()){
+      if (a == p ) return true;
+    };
+    return false
+  };
 
 
   stable var lastTaskId = 0;
+  stable var lastCertificateId = 0;
 
   public shared ({ caller }) func signUp({ name : Text }) : async LoginResult {
     if (Principal.isAnonymous(caller)) {
@@ -35,6 +63,7 @@ actor {
           user = newUser;
           notifications = [];
           msgs = [];
+          certificates = []; 
         });
       };
       case (?user) {
@@ -42,6 +71,10 @@ actor {
           user;
           notifications = getNotifications(caller);
           msgs = getMsgs(caller);
+          certificates = switch (Map.get<Principal, [Types.Certificate]>(certificates, phash, caller)){
+            case null [];
+            case (?c) c;
+          }
         });
       };
     };
@@ -55,9 +88,40 @@ actor {
           user;
           notifications = getNotifications(caller);
           msgs = getMsgs(caller);
+          certificates = switch (Map.get<Principal, [Types.Certificate]>(certificates, phash, caller)){
+            case null [];
+            case (?c) c;
+          }
         });
       };
     };
+  };
+
+  public shared ({ caller }) func certifyUser(user: Principal, certificate: Types.CertificateDataInit) : async () {
+    assert(Map.has<Principal, User>(users, phash, user));
+    assert(isAdmin(caller));
+    let {title; description; expirationDate } = certificate;
+    lastCertificateId += 1;
+    let newCertificate: Types.Certificate = {
+      title;
+      description;
+      expirationDate;
+      id = lastCertificateId;
+      owner = user;
+      expeditionDate = now();
+    };
+    let currentCertificates = switch(Map.get<Principal, [Types.Certificate]>(certificates, phash, user)){
+      case null [];
+      case (?c) c;
+    };
+    let updateCertificates = Array.tabulate<Types.Certificate>(
+      currentCertificates.size() + 1,
+      func x = if (x < currentCertificates.size()) { currentCertificates[x] } else { newCertificate }
+    );
+    ignore Map.put<Principal, [Types.Certificate]>(certificates, phash, user, updateCertificates);
+
+
+
   };
 
   public shared ({ caller }) func editProfile(data : UserUpdatableData) : async {
@@ -81,7 +145,19 @@ actor {
     #Ok(updatedUser);
   };
 
-  public shared ({ caller }) func enterCodeVerification(code: Text): async Bool {
+  public shared ({ caller }) func getVerificationCode(): async ?Nat {
+    switch (Map.get<Principal, User>(users, phash, caller)){ 
+      case null {return null};
+      case ( _ ) {
+        rand.setRange(100000, 999999);
+        let code = await rand.next();
+        ignore Map.put<Principal, Nat>(verificationCodes, phash, caller, code);
+        ?code;
+      }
+    }
+  };
+
+  public shared ({ caller }) func enterCodeVerification(code: Nat): async Bool {
     switch (Map.get<Principal, User>(users, phash, caller)){
       case null false;
       case (?user) {
@@ -275,8 +351,11 @@ actor {
 
   ///////////// private functions ///////////////
 
-  func verifyCode(u: Principal, code: Text): Bool {
-    return true
+  func verifyCode(u: Principal, _code: Nat): Bool {
+    switch (Map.remove<Principal, Nat>(verificationCodes, phash, u)){
+      case null false;
+      case ( ?code ) {code == _code}
+    }
   };
 
   func getNotifications(p : Principal) : [Types.Notification] {

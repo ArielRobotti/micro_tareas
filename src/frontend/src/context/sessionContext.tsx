@@ -76,7 +76,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await backend.singIn()
+      const response = await backend.signIn()
       if ("Ok" in response) {
         setUser(response.Ok.user);
         setNotifications(response.Ok.notifications);

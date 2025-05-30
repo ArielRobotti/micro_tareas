@@ -48,11 +48,26 @@ module {
         read : Bool;
     };
 
+    public type CertificateDataInit = {
+        title: Text;
+        description: Text;
+        expirationDate: ?Int;
+    };
+
+    public type Certificate = CertificateDataInit and {
+        id: Nat;
+        owner: Principal;
+        expeditionDate: Int;
+    };
+
+
+
     public type LoginResult = {
         #Ok : ({
             user : User;
             notifications : [Notification];
             msgs : [Msg];
+            certificates: [Certificate];
         });
         #Err : Text;
     };
