@@ -1,25 +1,26 @@
 import { SessionProvider } from "./context/sessionContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-import {Dashboard, Feed, Home} from "./pages";
+import { Dashboard, Feed, Home, BrowseJobs, HireFreelancer } from "./pages";
 import './App.css';
 
 function App() {
   return (
-    <div className="min-h-[200vh]">
-
-    <SessionProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/feed" element={<Feed />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </SessionProvider>
+    <div className="min-h-screen w-full bg-gray-50">
+      <SessionProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/feed" element={<Feed />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/jobs" element={<BrowseJobs />} />
+              <Route path="/hire" element={<HireFreelancer />} />
+              <Route path="*" element={<Home />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </SessionProvider>
     </div>
   );
 }
