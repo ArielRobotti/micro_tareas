@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSession } from '../context/sessionContext';
 import { useState } from 'react';
-import { TaskExpand } from '../declarations/backend/backend.did';
+import { TaskExpand, User } from '../declarations/backend/backend.did';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -11,7 +11,9 @@ const TaskDetail: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [task, setTask] = useState<TaskExpand | null>(null);
+    const [author, setAuthor] = useState<User | null>(null)
 
+    
     const fetchTask = async () => {
 
         console.log(user);
@@ -21,18 +23,23 @@ const TaskDetail: React.FC = () => {
             if (!id) {
                 throw new Error('Task ID is required');
             }
-            const taskData = await backend.expandTask(BigInt(1));
-            setTask(taskData[0] || null);
+            const taskData = await backend.expandTask(BigInt(id));
+            if(taskData.length > 0){
+                setTask(taskData[0]?.task || null);
+                if(taskData[0]) {setAuthor(taskData[0].author)}
+                
+            }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch task');
         } finally {
+            
             setLoading(false);
         }
     };
-
     useEffect(() => {
         fetchTask();
-    }, [id]);
+        console.log("autor", task)
+    }, [id,]);
 
     if (loading) {
         return (
@@ -113,7 +120,7 @@ const TaskDetail: React.FC = () => {
                 </div>
 
                 {/* Main Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-gray-600">
                     {/* Left Column - Task Details */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Description */}
@@ -143,7 +150,7 @@ const TaskDetail: React.FC = () => {
                                 {task.assets.length > 0 ? (
                                     task.assets.map((asset, index) => (
                                         <div key={index} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
-                                            <span className="text-gray-500">{asset.mimeTypes}</span>
+                                            <span className="text-gray-500">{asset.mimeType}</span>
                                         </div>
                                     ))
                                 ) : (
@@ -159,11 +166,10 @@ const TaskDetail: React.FC = () => {
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <h2 className="text-xl font-semibold mb-4">About the Client</h2>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                <div className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center">
                                     <span className="text-xl">👤</span>
-                                </div>
-                                <div>
-                                    <p className="font-medium">Client ID: {task.owner.toString()}</p>
+                                    <span>{author?.name}</span>
+                                    {author?.score != BigInt(0) && <span className='ml-6'>Score {author?.score}</span>}
                                 </div>
                             </div>
                         </div>

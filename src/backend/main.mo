@@ -234,10 +234,16 @@ shared ({caller = DEPLOYER}) actor class() {
     } else { { arr = []; hasNext = false } };
   };
 
-  public shared query func expandTask(id : Nat) : async ?Types.TaskExpand {
+  public shared query func expandTask(id : Nat) : async ?{task: Types.TaskExpand; author: User} {
     switch (Map.get<Nat, Task>(activeTasks, nhash, id)) {
       case null null;
-      case ( ?task ) { ?{task with bidsCounter = Map.size(task.bids)} };
+      case ( ?task ) {
+        let user = switch (Map.get<Principal, User>(users, phash, task.owner)){
+          case null {return null};
+          case (?user) user;
+        };
+        return ?{task = {task with bidsCounter = Map.size(task.bids)};  author = user};
+      }
     };
   };
 
