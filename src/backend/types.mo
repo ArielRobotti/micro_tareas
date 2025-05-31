@@ -50,6 +50,8 @@ module {
 
     public type CertificateDataInit = {
         title: Text;
+        recipientName: Text;
+        photo: Blob;
         description: Text;
         expirationDate: ?Int;
     };
@@ -58,6 +60,7 @@ module {
         id: Nat;
         owner: Principal;
         expeditionDate: Int;
+
     };
 
 

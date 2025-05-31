@@ -100,11 +100,13 @@ shared ({caller = DEPLOYER}) actor class() {
   public shared ({ caller }) func certifyUser(user: Principal, certificate: Types.CertificateDataInit) : async () {
     assert(Map.has<Principal, User>(users, phash, user));
     assert(isAdmin(caller));
-    let {title; description; expirationDate } = certificate;
+    let {title; description; expirationDate; photo; recipientName } = certificate;
     lastCertificateId += 1;
     let newCertificate: Types.Certificate = {
       title;
       description;
+      recipientName;
+      photo;
       expirationDate;
       id = lastCertificateId;
       owner = user;
@@ -119,9 +121,6 @@ shared ({caller = DEPLOYER}) actor class() {
       func x = if (x < currentCertificates.size()) { currentCertificates[x] } else { newCertificate }
     );
     ignore Map.put<Principal, [Types.Certificate]>(certificates, phash, user, updateCertificates);
-
-
-
   };
 
   public shared ({ caller }) func editProfile(data : UserUpdatableData) : async {
