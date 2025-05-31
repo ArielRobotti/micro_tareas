@@ -7,7 +7,6 @@
         "output": "./src/frontend/src/declarations/backend"
       }
     },
-
     "frontend": {
       "source": [
         "src/frontend/dist"
@@ -16,10 +15,10 @@
     },
     "internet_identity": {
       "type": "pull",
-      "id": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+      "id": "rdmx6-jaaaa-aaaaa-aaadq-cai",
+      "frontend": {}
     }
   },
-  
   "defaults": {
     "build": {
       "args": "",

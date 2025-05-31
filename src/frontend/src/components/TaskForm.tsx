@@ -58,7 +58,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const keywords = getKeywords()
-
+        console.log(keywords)
         if (!validateForm(keywords)) return;
 
         // const assets = await Promise.all(

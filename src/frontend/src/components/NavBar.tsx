@@ -26,7 +26,7 @@ const NavBar = () => {
 
   const handleRegister = async () => {
     if (name.length < 3 || name.length > 30) { return }
-    const registerResult = await backend.signUp({name: name.trim()});
+    const registerResult = await backend.signUp({ name: name.trim() });
 
     if ("Ok" in registerResult) {
       setShowModalRegister(false);
@@ -67,10 +67,10 @@ const NavBar = () => {
         {/* Navigation Links - Desktop */}
         <nav className="hidden sm:flex items-center gap-x-8">
           <Link
-            to="/jobs"
+            to="/tasks"
             className="text-gray-600 hover:text-green-600 transition-colors font-medium"
           >
-            Browse Jobs
+            Browse Tasks
           </Link>
           <Link
             to="/hire"
@@ -133,7 +133,7 @@ const NavBar = () => {
               ) : user ? (
                 <>
                   <div className='flex items-center justify-between'>
-                    <MessageIcon qty={msgs.length} className='fill-gray-800'/>
+                    <MessageIcon qty={msgs.length} className='fill-gray-800' />
                     <BellIcon
                       className='fill-gray-800'
                       onClick={handleClickBell}
@@ -167,62 +167,62 @@ const NavBar = () => {
         onClick={() => setShowModalRegister(false)}
       >
         <div
-            onClick={(e) => e.stopPropagation()}
-            className={`bg-white text-black p-3 rounded-[40px] transform transition-all duration-1000
+          onClick={(e) => e.stopPropagation()}
+          className={`bg-white text-black p-3 rounded-[40px] transform transition-all duration-1000
               ${showModalRegister ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}
-          >
-            <h2 className="font-semibold text-lg mb-2 text-center">Register User</h2>
-            <p className="text-sm mb-2">Principal ID: {identity.getPrincipal().toString()}</p>
-            <input
-              type="text"
-              required
-              maxLength={35}
-              placeholder="Name"
-              value={name}
-              onChange={handleChangeName}
-              className="border p-2 w-full mb-2 rounded-full text-center"
-            />
+        >
+          <h2 className="font-semibold text-lg mb-2 text-center">Register User</h2>
+          <p className="text-sm mb-2">Principal ID: {identity.getPrincipal().toString()}</p>
+          <input
+            type="text"
+            required
+            maxLength={35}
+            placeholder="Name"
+            value={name}
+            onChange={handleChangeName}
+            className="border p-2 w-full mb-2 rounded-full text-center"
+          />
 
 
-            <div className="text-sm flex items-center space-x-2">
-              {name.length === 0 ? (
-                <span className="text-gray-500">Must be between 3 and 30 characters</span>
-              ) : name.length < 3 || name.length > 30 ? (
-                <>
-                  <span className="text-red-600">❌ Must be between 3 and 30 characters</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-green-600">✅ Nombre válido</span>
-                </>
-              )}
-            </div>
-            <input
-              type="text"
-              required
-              maxLength={10}
+          <div className="text-sm flex items-center space-x-2">
+            {name.length === 0 ? (
+              <span className="text-gray-500">Must be between 3 and 30 characters</span>
+            ) : name.length < 3 || name.length > 30 ? (
+              <>
+                <span className="text-red-600">❌ Must be between 3 and 30 characters</span>
+              </>
+            ) : (
+              <>
+                <span className="text-green-600">✅ Nombre válido</span>
+              </>
+            )}
+          </div>
+          <input
+            type="text"
+            required
+            maxLength={10}
 
-              className="ml-20 border p-2 w-[70%] mt-3 mb-3 rounded-full text-center appearance-none [-moz-appearance:_textfield] 
+            className="ml-20 border p-2 w-[70%] mt-3 mb-3 rounded-full text-center appearance-none [-moz-appearance:_textfield] 
                 [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none 
                 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-            />
+          />
 
-            <div className="flex justify-between px-[30px]">
-              <button
-                style={{ backgroundColor: "#555555" }}
-                className="button w-[110px]"
-                onClick={() => setShowModalRegister(false)}
-              >
-                Close
-              </button>
-              <button
-                className="button w-[110px]"
-                onClick={handleRegister}
-              >
-                Done
-              </button>
-            </div>
+          <div className="flex justify-between px-[30px]">
+            <button
+              style={{ backgroundColor: "#555555" }}
+              className="button w-[110px]"
+              onClick={() => setShowModalRegister(false)}
+            >
+              Close
+            </button>
+            <button
+              className="button w-[110px]"
+              onClick={handleRegister}
+            >
+              Done
+            </button>
           </div>
+        </div>
       </div>
     </header>
   );
