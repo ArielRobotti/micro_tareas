@@ -34,7 +34,7 @@ const defaultSessionContext: SessionContextType = {
   }),
   login: () => { },
   logout: async () => { },
-  updateUser: () => {},
+  updateUser: () => { },
 };
 
 export const SessionContext = createContext<SessionContextType>(defaultSessionContext);
@@ -76,20 +76,20 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await backend.signIn()
+      const response = await backend.singIn()
       if ("Ok" in response) {
         setUser(response.Ok.user);
         setNotifications(response.Ok.notifications);
         setMsgs(response.Ok.msgs);
       }
     }
-    if(isAuthenticated) {
+    if (isAuthenticated) {
       getUser()
     } else {
       setUser(null);
     }
   }, [isAuthenticated, backend]);
-  
+
 
   async function init() {
     const authClient = await AuthClient.create();
@@ -142,14 +142,15 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   return (
     <SessionContext.Provider value={
-      { 
+      {
         user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser,
-        login: handleLoginClick, logout }
+        login: handleLoginClick, logout
       }
+    }
     >
       {children}
       <ModalProviderSelect
-        internetIdentityUrl= {host}
+        internetIdentityUrl={host}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelectProvider={handleProviderSelection}
