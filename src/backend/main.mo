@@ -228,7 +228,7 @@ shared ({caller = DEPLOYER}) actor class() {
         deliverySize,
       );
       {
-        arr = Array.map<Task, TaskPreview>(subArray, func x = { x with bidsCounter = x.bids.size() });
+        arr = Array.map<Task, TaskPreview>(subArray, func x = { x with bidsCounter = Map.size(x.bids) });
         hasNext;
       };
     } else { { arr = []; hasNext = false } };

@@ -1,14 +1,15 @@
+// import React from 'react';
 import TaskForm from '../components/TaskForm';
+import { useSession } from "../context/sessionContext";
+import { TaskDataInit } from "../declarations/backend/backend.did"
 
 const HireFreelancer = () => {
-    const handleSubmit = (data: {
-        title: string;
-        description: string;
-        keywords: string;
-        rewardRange: [number, number];
-        assets: Array<{ mimeType: string; data: Blob }>;
-    }) => {
-        // TODO: Implement the submission logic to the backend
+
+    const { backend } = useSession();
+    const handleSubmit = async (data: TaskDataInit) => {
+
+        const response = await backend.createTask(data);
+        if ("Ok" in response) { alert("the task was created successfully") }
         console.log('Form submitted:', data);
     };
 

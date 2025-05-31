@@ -49,25 +49,23 @@ module {
     };
 
     public type CertificateDataInit = {
-        title: Text;
-        description: Text;
-        expirationDate: ?Int;
+        title : Text;
+        description : Text;
+        expirationDate : ?Int;
     };
 
     public type Certificate = CertificateDataInit and {
-        id: Nat;
-        owner: Principal;
-        expeditionDate: Int;
+        id : Nat;
+        owner : Principal;
+        expeditionDate : Int;
     };
-
-
 
     public type LoginResult = {
         #Ok : ({
             user : User;
             notifications : [Notification];
             msgs : [Msg];
-            certificates: [Certificate];
+            certificates : [Certificate];
         });
         #Err : Text;
     };
@@ -84,7 +82,7 @@ module {
         description : Text;
         keywords : [Text];
         rewardRange : (Nat, Nat);
-        assets : [{ mimeTypes : Text; data : Blob }];
+        assets : [{ mimeType : Text; data : Blob }];
     };
 
     public type Offer = {
@@ -107,6 +105,7 @@ module {
         owner : Principal;
         title : Text;
         description : Text;
+        keywords : [Text];
         rewardRange : (Nat, Nat);
         createdAt : Int;
         bidsCounter : Nat;

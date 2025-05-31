@@ -28,7 +28,7 @@ export const HomeIcon: React.FC<IconProps> = ({ className = "", onClick }) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
       className={`w-8 h-8 text-gray-700 cursor-pointer ${className}`}
-      fill="#dedede"
+      // fill="#dedede"
       aria-hidden="true"
     >
       <path d="M12 3L3 10v1h2v8h5v-6h4v6h5v-8h2v-1L12 3z" />
@@ -41,8 +41,8 @@ export const BellIcon: React.FC<IconProps & { qty: number }> = ({ className = ""
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 28"
-      className="w-9 h-9 text-gray-700 cursor-pointer"
-      fill="#dedede"
+      className={`w-9 h-9 text-gray-700 cursor-pointer  fill="#dedede ${className}`}
+      //"
       aria-hidden="true"
     >
       <path d="M12 2C10.343 2 9 3.343 9 5v1.068C6.165 7.2 4.5 9.828 4.5 13v3l-1.5 1.5v1h18v-1L19.5 16v-3c0-3.172-1.665-5.8-4.5-6.932V5c0-1.657-1.343-3-3-3zm0 20c1.104 0 2-.896 2-2h-4c0 1.104.896 2 2 2z" />
@@ -60,7 +60,7 @@ export const MessageIcon: React.FC<IconProps & { qty: number }> = ({ className =
   <div className={`relative w-9 h-8 ml-4 ${className}`} onClick={onClick}>
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      className={`w-8 h-8 cursor-pointer fill-[#dedede] ${className}`}
+      className={`w-8 h-8 cursor-pointer className='fill-gray-800' ${className}`}
       viewBox="0 0 24 24"
     >
       <g data-name="Layer 2">
