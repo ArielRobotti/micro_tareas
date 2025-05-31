@@ -55,9 +55,11 @@ const JobCard: React.FC<JobCardProps> = ({
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
                 {task.keywords.map((tag) => (
-                    <span key={tag} className="bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full text-xs font-medium">
-                        {tag}
-                    </span>
+                    <>
+                    {tag.length > 0 && (<span key={tag} className="bg-gray-400 text-gray-700 px-2 sm:px-3 py-1 rounded-full text-xs font-medium">
+                        {tag.toUpperCase()}
+                    </span>)}
+                    </>
                 ))}
             </div>
             {/* <div className="flex items-center justify-between mt-2">

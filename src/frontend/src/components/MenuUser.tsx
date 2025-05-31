@@ -45,7 +45,11 @@ const MenuUser = () => {
             }`}
         >
           <div onMouseDown={() => navigate("/dashboard")} className="flex items-center justify-between py-1 hover:bg-gray-500 hover:rounded-t-lg">
-            <button className="block w-full text-left px-4 py-2 hover:bg-gray-500">Profile {user?.name.split(" ")[0]}</button>
+            <span className="block w-full text-left px-4 py-2 hover:bg-gray-500">Profile {user?.name.split(" ")[0]}</span>
+          </div>
+
+          <div onMouseDown={() => navigate("/dashboard")} className="flex items-center justify-between py-1 hover:bg-gray-500 ">
+            <span className="block bg-[#00990000] w-full text-left px-4 py-2 hover:bg-gray-500">My tasks</span>
           </div>
   
           <hr className=" border-gray-500" />
@@ -53,7 +57,7 @@ const MenuUser = () => {
           <div onMouseDown={logout}>
             <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-500 hover:rounded-b-lg">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6  text-white" enableBackground="new 0 0 24 24" viewBox="0 0 24 24" focusable="false" aria-hidden="true" ><path fill="currentColor" d="M20 3v18H8v-1h11V4H8V3h12zm-8.9 12.1.7.7 4.4-4.4L11.8 7l-.7.7 3.1 3.1H3v1h11.3l-3.2 3.3z"></path></svg>
-              <button className="block w-full text-left text-white px-4 py-2 hover:bg-gray-500">Log out</button>
+              <span className="block w-full text-left text-white px-4 py-2 hover:bg-gray-500">Log out</span>
             </div>
           </div>
         </div>

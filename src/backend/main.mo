@@ -120,7 +120,7 @@ actor {
   };
 
   public shared query func getPaginateTaskPreview({ page : Nat; qtyPerPage : ?Nat }) : async { arr : [TaskPreview]; hasNext : Bool } {
-    let taskArray = Iter.toArray(Map.vals<Nat, Task>(activeTasks));
+    let taskArray = Array.reverse(Iter.toArray(Map.vals<Nat, Task>(activeTasks)));
     let _qtyPerPage = switch (qtyPerPage) { case null 10; case (?n) n };
 
     if (taskArray.size() >= page * _qtyPerPage) {
