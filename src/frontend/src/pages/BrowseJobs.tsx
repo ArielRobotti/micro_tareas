@@ -1,11 +1,32 @@
-import React from 'react';
+import {useEffect, useState} from 'react';
+
 import JobCard from '../components/JobCard';
+import { useSession } from '../context/sessionContext'
+import { TaskPreview } from '../declarations/backend/backend.did'
 
 const BrowseJobs = () => {
+    const { backend } = useSession();
+    const [previewsTask, setPreviewsTask] = useState<TaskPreview[]>([]);
+    const [, setHasNextPage] = useState(false);
+    
+    useEffect(() => {
+        const fetchJobs = async () => {
+            const response = await backend.getPaginateTaskPreview({ page: BigInt(0), qtyPerPage: [BigInt(50)] })
+            setPreviewsTask( response.arr);
+            setHasNextPage(response.hasNext)
+        };
+        fetchJobs()
+    }, [backend] )
+
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-6">Browse Jobs</h1>
-            <JobCard
+            {previewsTask.map(
+                (task) => (
+                    <JobCard task={task} />
+                )
+            )}
+            {/* <JobCard
                 title="Smart Contract Developer for DeFi Protocol"
                 description='Seeking an experienced smart contract developer to build and audit DeFi protocols. Must have experience with Solidity, Web3.js, and DeFi concepts. The role involves developing secure smart contracts, implementing tokenomics, and ensuring protocol security through comprehensive testing and auditing.'
                 tags={["Solidity", "Web3.js", "DeFi", "Smart Contracts", "Ethereum", "Hardhat", "TypeScript"]}
@@ -32,7 +53,8 @@ const BrowseJobs = () => {
                     lastReply: "1 day ago",
                 }}
                 onPlaceBid={() => alert("Bid placed!")}
-            />
+            /> */}
+            
         </div>
     );
 };

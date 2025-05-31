@@ -8,7 +8,6 @@ import ModalProviderSelect from '../components/auth/ModalProviderSelect';
 const canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND as string
 const host = import.meta.env.VITE_DFX_NETWORK === "local" ? "http://localhost:4943/?canisterId=rdmx6-jaaaa-aaaaa-aaadq-cai" : "https://identity.ic0.app";
 
-
 type SessionContextType = {
   user: User | null;
   notifications: Notification[];
@@ -20,6 +19,9 @@ type SessionContextType = {
   login: () => void;
   logout: () => Promise<void>;
   updateUser: (user: User) => void;
+  updateNotifications: (notifications: Notification[]) => void;
+  updateUnreadMessages: (messagesPrev: Msg[]) => void;
+  
 };
 
 const defaultSessionContext: SessionContextType = {
@@ -35,6 +37,8 @@ const defaultSessionContext: SessionContextType = {
   login: () => { },
   logout: async () => { },
   updateUser: () => {},
+  updateNotifications: () =>{ },
+  updateUnreadMessages: () => {},
 };
 
 export const SessionContext = createContext<SessionContextType>(defaultSessionContext);
@@ -49,6 +53,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  
   const [backend, setBackend] = useState<ActorSubclass<_SERVICE>>(
     createActor(canisterId, {
       agentOptions: { identity: new AnonymousIdentity(), host }
@@ -76,7 +81,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const response = await backend.singIn()
+      const response = await backend.signIn()
       if ("Ok" in response) {
         setUser(response.Ok.user);
         setNotifications(response.Ok.notifications);
@@ -87,6 +92,8 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
       getUser()
     } else {
       setUser(null);
+      setNotifications([]);
+      setMsgs([])
     }
   }, [isAuthenticated, backend]);
   
@@ -102,6 +109,14 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   const updateUser = (user: User) => {
     setUser(user);
+  };
+
+  const updateNotifications = (updatedNotifications: Notification[]) => {
+    setNotifications(updatedNotifications);
+  };
+
+  const updateUnreadMessages = (updatedMessages: Msg[]) => {
+    setMsgs(updatedMessages)
   };
 
   const handleLoginClick = () => {
@@ -143,7 +158,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   return (
     <SessionContext.Provider value={
       { 
-        user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser,
+        user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser, updateNotifications, updateUnreadMessages,
         login: handleLoginClick, logout }
       }
     >

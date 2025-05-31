@@ -47,7 +47,7 @@ actor {
     };
   };
 
-  public shared query ({ caller }) func singIn() : async LoginResult {
+  public shared query ({ caller }) func signIn() : async LoginResult {
     switch (Map.get<Principal, User>(users, phash, caller)) {
       case null { #Err("User not found") };
       case (?user) {
@@ -134,7 +134,7 @@ actor {
         deliverySize,
       );
       {
-        arr = Array.map<Task, TaskPreview>(subArray, func x = { x with bidsCounter = x.bids.size() });
+        arr = Array.map<Task, TaskPreview>(subArray, func x = { x with bidsCounter = Map.size(x.bids) });
         hasNext;
       };
     } else { { arr = []; hasNext = false } };

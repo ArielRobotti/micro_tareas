@@ -1,34 +1,41 @@
 import React, { useState } from 'react';
+import { TaskDataInit } from "../declarations/backend/backend.did"
 
 interface TaskFormProps {
-    onSubmit: (data: {
-        title: string;
-        description: string;
-        keywords: string;
-        rewardRange: [number, number];
-        assets: Array<{ mimeType: string; data: Blob }>;
-    }) => void;
+    onSubmit: (data: TaskDataInit) => void;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [keywords, setKeywords] = useState('');
+    const [rawKeywords, setRawKeywords] = useState('');
     const [minReward, setMinReward] = useState('');
     const [maxReward, setMaxReward] = useState('');
     const [files, setFiles] = useState<File[]>([]);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const validateForm = () => {
+    const cleanForm = () => {
+        setTitle('');
+        setDescription('')
+        setRawKeywords('')
+        setMinReward('')
+        setMaxReward('')
+        setFiles([])
+        setErrors({})
+    }
+
+    const validateForm = (keywords: string[]) => {
         const newErrors: Record<string, string> = {};
 
+        console.log("no hay keywords")
+        console.log(rawKeywords.length)
         if (!title.trim()) {
             newErrors.title = 'Title is required';
         }
         if (!description.trim()) {
             newErrors.description = 'Description is required';
         }
-        if (!keywords.trim()) {
+        if (keywords.length < 1) {
             newErrors.keywords = 'At least one keyword is required';
         }
         if (!minReward || !maxReward) {
@@ -41,25 +48,34 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const getKeywords = () => {
+        return rawKeywords
+            .split(',')
+            .map(keyword => keyword.trim().toLowerCase())
+            .filter(keyword => keyword.length > 0);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const keywords = getKeywords()
 
-        if (!validateForm()) return;
+        if (!validateForm(keywords)) return;
 
-        const assets = await Promise.all(
-            files.map(async (file) => ({
-                mimeType: file.type,
-                data: file
-            }))
-        );
+        // const assets = await Promise.all(
+        //     files.map(async (file) => ({
+        //         mimeType: file.type,
+        //         data: file
+        //     }))
+        // );
 
         onSubmit({
             title,
             description,
             keywords,
-            rewardRange: [Number(minReward), Number(maxReward)],
-            assets
+            rewardRange: [BigInt(minReward), BigInt(maxReward)],
+            assets: []
         });
+        cleanForm()
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +85,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow-sm">
+        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4 sm:p-6 bg-white rounded-xl shadow-sm text-gray-800">
             <h2 className="text-2xl font-bold mb-6 text-gray-800">Create New Task</h2>
 
             {/* Title */}
@@ -118,8 +134,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
                 <input
                     type="text"
                     id="keywords"
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
+                    value={rawKeywords}
+                    onChange={(e) => setRawKeywords(e.target.value)}
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.keywords ? 'border-red-500' : 'border-gray-300'
                         }`}
                     placeholder="e.g., React, TypeScript, Web3"

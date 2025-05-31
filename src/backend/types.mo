@@ -69,9 +69,9 @@ module {
     public type TaskDataInit = {
         title: Text;
         description: Text;
-        kewwords: Text;
+        keywords: [Text];
         rewardRange: (Nat, Nat);
-        assets: [{mimeTypes: Text; data:Blob}];
+        assets: [{mimeType: Text; data:Blob}];
     };
    
     public type Offer = {
@@ -93,6 +93,7 @@ module {
         owner: Principal;
         title: Text;
         description: Text;
+        keywords: [Text];
         rewardRange: (Nat, Nat);
         createdAt: Int;
         bidsCounter: Nat;
