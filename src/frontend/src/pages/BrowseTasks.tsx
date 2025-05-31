@@ -1,29 +1,38 @@
-import {useEffect, useState} from 'react';
-
-import JobCard from '../components/JobCard';
+import { useEffect, useState } from 'react';
+import TaskCard from '../components/TaskCard';
 import { useSession } from '../context/sessionContext'
 import { TaskPreview } from '../declarations/backend/backend.did'
+import { useNavigate } from 'react-router-dom';
 
-const BrowseJobs = () => {
+const BrowseTasks = () => {
     const { backend } = useSession();
     const [previewsTask, setPreviewsTask] = useState<TaskPreview[]>([]);
     const [, setHasNextPage] = useState(false);
-    
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchJobs = async () => {
             const response = await backend.getPaginateTaskPreview({ page: BigInt(0), qtyPerPage: [BigInt(50)] })
-            setPreviewsTask( response.arr);
+            setPreviewsTask(response.arr);
             setHasNextPage(response.hasNext)
         };
         fetchJobs()
-    }, [backend] )
+    }, [backend])
+
+    const handleTaskClick = (taskId: bigint) => {
+        navigate(`/tasks/${taskId.toString()}`);
+    };
 
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-6">Browse Jobs</h1>
             {previewsTask.map(
                 (task) => (
-                    <JobCard task={task} />
+                    <TaskCard
+                        key={task.id.toString()}
+                        task={task}
+                        onPlaceBid={() => handleTaskClick(task.id)}
+                    />
                 )
             )}
             {/* <JobCard
@@ -54,9 +63,9 @@ const BrowseJobs = () => {
                 }}
                 onPlaceBid={() => alert("Bid placed!")}
             /> */}
-            
+
         </div>
     );
 };
 
-export default BrowseJobs; 
+export default BrowseTasks; 

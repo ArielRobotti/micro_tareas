@@ -1,7 +1,7 @@
 import React from 'react';
 import { TaskPreview } from '../declarations/backend/backend.did';
 
-interface JobCardProps {
+interface TaskCardProps {
     // title: string;
     // description: string;
     // tags: string[];
@@ -19,7 +19,7 @@ interface JobCardProps {
     onPlaceBid?: () => void;
 }
 
-const JobCard: React.FC<JobCardProps> = ({
+const TaskCard: React.FC<TaskCardProps> = ({
     // title,
     // description,
     // tags,
@@ -31,19 +31,25 @@ const JobCard: React.FC<JobCardProps> = ({
     onPlaceBid,
 }) => {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 max-w-2xl mx-auto mb-6">
+        <div
+            className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-6 max-w-2xl mx-auto mb-6 cursor-pointer hover:shadow-md transition-shadow"
+            onClick={onPlaceBid}
+        >
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-2">
                 <div className="flex-1">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-800 leading-tight mb-1 truncate">{task.title}</h2>
                     <div className="text-xs text-gray-500 leading-tight mb-1">
-                        Published: {new Date(Number(task.createdAt) / 1000000).toLocaleString()} 
-                        <span className='ml-10'>bids: {task.bidsCounter} </span> 
+                        Published: {new Date(Number(task.createdAt) / 1000000).toLocaleString()}
+                        <span className='ml-10'>bids: {task.bidsCounter} </span>
                     </div>
                 </div>
                 <div className="flex flex-col items-start sm:items-end gap-2">
                     <button
                         className="w-full sm:w-auto border border-blue-400 text-blue-600 rounded-full px-5 py-2 font-semibold hover:bg-blue-50 transition"
-                        onClick={onPlaceBid}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onPlaceBid?.();
+                        }}
                     >
                         Place a bid
                     </button>
@@ -79,4 +85,4 @@ const JobCard: React.FC<JobCardProps> = ({
     );
 };
 
-export default JobCard; 
+export default TaskCard; 

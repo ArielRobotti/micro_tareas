@@ -7,9 +7,9 @@ const HireFreelancer = () => {
 
     const { backend } = useSession();
     const handleSubmit = async (data: TaskDataInit) => {
-        
-        const response  = await backend.createTask(data);
-        if("Ok" in response){alert("the task was created successfully")}
+
+        const response = await backend.createTask(data);
+        if ("Ok" in response) { alert("the task was created successfully") }
         console.log('Form submitted:', data);
     };
 

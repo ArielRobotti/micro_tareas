@@ -21,7 +21,7 @@ type SessionContextType = {
   updateUser: (user: User) => void;
   updateNotifications: (notifications: Notification[]) => void;
   updateUnreadMessages: (messagesPrev: Msg[]) => void;
-  
+
 };
 
 const defaultSessionContext: SessionContextType = {
@@ -36,9 +36,9 @@ const defaultSessionContext: SessionContextType = {
   }),
   login: () => { },
   logout: async () => { },
-  updateUser: () => {},
-  updateNotifications: () =>{ },
-  updateUnreadMessages: () => {},
+  updateUser: () => { },
+  updateNotifications: () => { },
+  updateUnreadMessages: () => { },
 };
 
 export const SessionContext = createContext<SessionContextType>(defaultSessionContext);
@@ -53,7 +53,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [msgs, setMsgs] = useState<Msg[]>([]);
-  
+
   const [backend, setBackend] = useState<ActorSubclass<_SERVICE>>(
     createActor(canisterId, {
       agentOptions: { identity: new AnonymousIdentity(), host }
@@ -88,7 +88,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
         setMsgs(response.Ok.msgs);
       }
     }
-    if(isAuthenticated) {
+    if (isAuthenticated) {
       getUser()
     } else {
       setUser(null);
@@ -96,7 +96,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
       setMsgs([])
     }
   }, [isAuthenticated, backend]);
-  
+
 
   async function init() {
     const authClient = await AuthClient.create();
@@ -157,14 +157,15 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
 
   return (
     <SessionContext.Provider value={
-      { 
+      {
         user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser, updateNotifications, updateUnreadMessages,
-        login: handleLoginClick, logout }
+        login: handleLoginClick, logout
       }
+    }
     >
       {children}
       <ModalProviderSelect
-        internetIdentityUrl= {host}
+        internetIdentityUrl={host}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelectProvider={handleProviderSelection}
