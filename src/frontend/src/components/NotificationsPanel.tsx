@@ -8,7 +8,7 @@ interface Props {
 }
 
 const NotificationsPanel = ({onClose}: Props) => {
-  const { notifications, backend, markNotificationAsRead } = useSession();
+  const { notifications } = useSession();
 
 
   return (
@@ -29,8 +29,7 @@ const NotificationsPanel = ({onClose}: Props) => {
                 notif={notif}
                 onClick={() => {
                   // llamada ignorada al backend para setear la notificacion como leida
-                  backend.readNotification(notif.date);
-                  markNotificationAsRead(notif.date)
+
                   onClose();
                 }}
               />
