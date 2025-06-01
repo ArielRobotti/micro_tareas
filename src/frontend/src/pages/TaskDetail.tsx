@@ -15,6 +15,7 @@ const TaskDetail: React.FC = () => {
     const [author, setAuthor] = useState<User | null>(null)
     const [bids, setBids] = useState<[Principal, Offer][]>([])
     const [showMyBid, setShowMyBid] = useState(false);
+    const [showInfoAuthor, setShowInfoAuthor] = useState(false);
     const [amountBid, setAmountBid] = useState(BigInt(0));
 
 
@@ -224,13 +225,35 @@ const TaskDetail: React.FC = () => {
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <h2 className="text-xl font-semibold mb-4">About the Client</h2>
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                                <div 
+                                    className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                                    onClick={() => setShowInfoAuthor(!showInfoAuthor)}
+                                >
                                     <span className="text-xl">👤</span>
                                     <span>{author?.name}</span>
                                     {author?.score != BigInt(0) && <span className='ml-6'>Score {author?.score}</span>}
                                 </div>
                             </div>
                         </div>
+                        {/* Sacar esto hacia una page de perfil */}
+                        {showInfoAuthor && author && (
+                            <div className='absolute top-100 right-100 bg-gray-300 p-4 rounded-lg shadow-md'>
+                                <p>Name: {author.name}</p>
+                                <p>Score: {author.score}</p>
+                                <p>Verified: {author.verified ? "Yes" : "No" }</p>
+                                <div className='flex flex-row'>Active Tasks
+                                    {
+                                    author.tasks.map((id) => (
+                                        <div 
+                                            className='h-8 w-8 bg-gray-500 rounded-full text-center p-1 mx-2 cursor-pointer select-none'
+                                            onClick={() => {console.log(`navegar a la tarea ${id}`)}}
+                                        >
+                                            {id}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Bids Overview */}
                         <div className="bg-white rounded-xl shadow-sm p-6">

@@ -115,7 +115,7 @@ const NavBar = () => {
           <div className="absolute top-16 left-0 right-0 bg-white shadow-lg sm:hidden">
             <nav className="flex flex-col p-4 space-y-4">
               <Link
-                to="/jobs"
+                to="/tasks"
                 className="text-gray-600 hover:text-green-600 transition-colors font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
