@@ -67,7 +67,6 @@ const TaskDetail: React.FC = () => {
 
     useEffect(() => {
         fetchTask();
-
     }, [id]);
 
     if (loading) {
@@ -246,7 +245,6 @@ const TaskDetail: React.FC = () => {
                                         <div key={index}>{bid[1].amount.toString()}</div>
                                     ))
                                 )}
-
                             </div>
 
                         </div>

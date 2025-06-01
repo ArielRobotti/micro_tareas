@@ -27,8 +27,6 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
     const validateForm = (keywords: string[]) => {
         const newErrors: Record<string, string> = {};
 
-        console.log("no hay keywords")
-        console.log(rawKeywords.length)
         if (!title.trim()) {
             newErrors.title = 'Title is required';
         }
