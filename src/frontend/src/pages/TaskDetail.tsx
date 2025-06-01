@@ -1,45 +1,74 @@
 import React from 'react';
+import { Principal } from "@dfinity/principal"
 import { useSession } from '../context/sessionContext';
 import { useState } from 'react';
-import { TaskExpand, User } from '../declarations/backend/backend.did';
+import { TaskExpand, User, Offer, TaskStatus } from '../declarations/backend/backend.did';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 const TaskDetail: React.FC = () => {
     const { id } = useParams();
-    const { backend, user, isAuthenticated } = useSession();
+    const { backend } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [task, setTask] = useState<TaskExpand | null>(null);
     const [author, setAuthor] = useState<User | null>(null)
+    const [bids, setBids] = useState<[Principal, Offer][]>([])
+    const [showMyBid, setShowMyBid] = useState(false);
+    const [amountBid, setAmountBid] = useState(BigInt(0));
 
-    
+
+
     const fetchTask = async () => {
 
-        console.log(user);
-        console.log(isAuthenticated);
         try {
             setLoading(true);
             if (!id) {
                 throw new Error('Task ID is required');
             }
             const taskData = await backend.expandTask(BigInt(id));
-            if(taskData.length > 0){
-                setTask(taskData[0]?.task || null);
-                if(taskData[0]) {setAuthor(taskData[0].author)}
-                
+            if (taskData[0]) {
+                setTask(taskData[0].task || null);
+                if (taskData[0]) {
+                    setAuthor(taskData[0].author)
+                    setBids(taskData[0].bidsDetails)
+                    setAmountBid(taskData[0].task.rewardRange[0])
+                }
+
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch task');
         } finally {
-            
             setLoading(false);
+
         }
     };
+
+    const getStatus = (status: TaskStatus) => {
+        if ("ToDo" in status) { return "To Do" }
+        if ("InProgress" in status) { return "In Progress" }
+        if ("Done" in status) { return "Done" }
+        if ("Assigned" in status) { return "Assigned" }
+        if ("Cancelled" in status) { return "Cancelled" }
+
+    }
+
+    const handlePlaceBid = async () => {
+        if(task){
+            const responsePlaceBid = await backend.applyForTask({ taskId: task.id, amount: BigInt(amountBid)});
+            if("Ok" in responsePlaceBid) {
+                alert("success")
+            };
+            if("Err" in responsePlaceBid){
+                alert(responsePlaceBid.Err)
+            }
+        } 
+    }
+
     useEffect(() => {
         fetchTask();
-        console.log("autor", task)
-    }, [id,]);
+
+    }, [id]);
 
     if (loading) {
         return (
@@ -101,20 +130,50 @@ const TaskDetail: React.FC = () => {
                                 {task.title}
                             </h1>
                             <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <span>Created: {new Date(Number(task.createdAt)).toLocaleDateString()}</span>
+                                <span>Created: {new Date(Number(task.createdAt) / 1000000).toLocaleDateString()}</span>
                                 <span>•</span>
-                                <span>Status: {task.status.toString()}</span>
+                                <span>Status: {getStatus(task.status)}</span>
                             </div>
                         </div>
                         <div className="flex flex-col items-start sm:items-end gap-2">
                             <div className="text-xl font-bold text-gray-800">
                                 Reward: {task.rewardRange[0]} - {task.rewardRange[1]} USDC
                             </div>
-                            <button
+
+                            {/* Contenedor relativo para posicionar el div flotante */}
+                            <div className="relative">
+                                <button
+                                onClick={() => setShowMyBid(!showMyBid)}
                                 className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                            >
+                                >
                                 Place Bid
-                            </button>
+                                </button>
+
+                                {/* Div flotante absolutamente posicionado respecto al botón */}
+                                {showMyBid && (
+                                <div className="absolute h-50 w-50 right-0 bg-gray-400 rounded shadow-lg text-center flex flex-col items-center justify-center z-10">
+                                    <div className='h-10 w-40 bg-gray-500 rounded-full flex items-center justify-center mb-5'>
+                                        <input 
+                                            type="number"
+                                            onChange={(e) => setAmountBid(BigInt(e.target.value))}
+                                            className='w-24 text-center rounded-full px-2 py-1 text-gray-900
+                                            focus:outline-none 
+                                            [&::-webkit-outer-spin-button]:appearance-none 
+                                            [&::-webkit-inner-spin-button]:appearance-none 
+                                            [-moz-appearance:textfield]' 
+                                            placeholder={task.rewardRange[0].toString()}/>
+                                            
+                                        <span>USD</span>
+                                    </div>
+                                    <span
+                                        onClick={handlePlaceBid}
+                                        className='bg-[#2244ff] rounded-full py-2 px-4 w-40 hover:bg-[#1122ff] cursor-pointer'
+                                    >
+                                        submit
+                                    </span>
+                                </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,16 +191,16 @@ const TaskDetail: React.FC = () => {
                         </div>
 
                         {/* Keywords */}
-                        {/* <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-white rounded-xl shadow-sm p-6">
                             <h2 className="text-xl font-semibold mb-4">Required Skills</h2>
                             <div className="flex flex-wrap gap-2">
                                 {task.keywords.map((keyword, index) => (
-                                    <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                                    <span key={index} className="bg-gray-400 text-gray-700 px-3 py-1 rounded-full text-sm">
                                         {keyword}
                                     </span>
                                 ))}
                             </div>
-                        </div> */}
+                        </div>
 
                         {/* Attachments */}
                         <div className="bg-white rounded-xl shadow-sm p-6">
@@ -175,15 +234,22 @@ const TaskDetail: React.FC = () => {
                         </div>
 
                         {/* Bids Overview */}
-                        {/* <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="bg-white rounded-xl shadow-sm p-6">
                             <h2 className="text-xl font-semibold mb-4">Bids Overview</h2>
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-500">Total bids</span>
                                     <span>{task.bidsCounter}</span>
                                 </div>
+                                {task.bidsCounter !== BigInt(0) && Array.isArray(bids) && bids.length > 0 && (
+                                    bids.map((bid, index) => (
+                                        <div key={index}>{bid[1].amount.toString()}</div>
+                                    ))
+                                )}
+
                             </div>
-                        </div> */}
+
+                        </div>
                     </div>
                 </div>
             </div>

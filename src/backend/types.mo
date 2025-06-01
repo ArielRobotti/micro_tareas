@@ -88,7 +88,6 @@ module {
     public type Offer = {
         amount : Nat;
         date : Int;
-
     };
 
     public type TaskExpand = TaskDataInit and {

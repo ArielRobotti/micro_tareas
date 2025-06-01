@@ -171,6 +171,11 @@ shared ({caller = DEPLOYER}) actor class() {
     }
   };
 
+  public shared ({ caller }) func getUser(u: Principal): async ?User {
+    assert(isUser(caller));
+    Map.get<Principal, User>(users, phash, u)
+  };
+
   ///////////////// Crud Tareas //////////////////
 
   public shared ({ caller }) func createTask(data : TaskDataInit) : async {
@@ -215,7 +220,7 @@ shared ({caller = DEPLOYER}) actor class() {
 
   public shared query func getPaginateTaskPreview({ page : Nat; qtyPerPage : ?Nat }) : async { arr : [TaskPreview]; hasNext : Bool } {
     let taskArray = Array.reverse(Iter.toArray(Map.vals<Nat, Task>(activeTasks)));
-    let _qtyPerPage = switch (qtyPerPage) { case null 10; case (?n) n };
+    let _qtyPerPage = switch (qtyPerPage) { case null 50; case (?n) n };
 
     if (taskArray.size() >= page * _qtyPerPage) {
       let (deliverySize : Nat, hasNext : Bool) = if (taskArray.size() >= (page + 1) * _qtyPerPage) {
@@ -234,7 +239,13 @@ shared ({caller = DEPLOYER}) actor class() {
     } else { { arr = []; hasNext = false } };
   };
 
-  public shared query func expandTask(id : Nat) : async ?{task: Types.TaskExpand; author: User} {
+  type TaskExpandResponse = {
+    task: Types.TaskExpand; 
+    author: User; 
+    bidsDetails: [(Principal, Types.Offer)]
+  };
+
+  public shared query ({caller}) func expandTask(id : Nat) : async ?TaskExpandResponse {
     switch (Map.get<Nat, Task>(activeTasks, nhash, id)) {
       case null null;
       case ( ?task ) {
@@ -242,7 +253,9 @@ shared ({caller = DEPLOYER}) actor class() {
           case null {return null};
           case (?user) user;
         };
-        return ?{task = {task with bidsCounter = Map.size(task.bids)};  author = user};
+        let bidsCounter = Map.size(task.bids);
+        let bidsDetails = if(caller == task.owner){Map.toArray(task.bids)} else { [] };
+        return ?{task = {task with bidsCounter};  author = user; bidsDetails};
       }
     };
   };
@@ -356,6 +369,10 @@ shared ({caller = DEPLOYER}) actor class() {
 
 
   ///////////// private functions ///////////////
+
+  func isUser(p: Principal): Bool {
+    Map.has<Principal, User>(users, phash, p)
+  };
 
   func verifyCode(u: Principal, _code: Nat): Bool {
     switch (Map.remove<Principal, Nat>(verificationCodes, phash, u)){
