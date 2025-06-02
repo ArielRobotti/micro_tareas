@@ -51,6 +51,7 @@ module {
     public type CertificateDataInit = {
         title : Text;
         description : Text;
+        image: ?Blob;
         expirationDate : ?Int;
     };
 

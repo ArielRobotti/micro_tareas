@@ -11,8 +11,8 @@ const UserDetail: React.FC = () => {
     const { id } = useParams();
     const { backend } = useSession();
 
-    const [user, setUser] = useState<any | null>(null);
-    const [certificates, setCertificates] = useState<any[]>([]);
+    const [user, setUser] = useState<User | null>(null);
+    const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
@@ -22,19 +22,22 @@ const UserDetail: React.FC = () => {
                 throw new Error('user id is required');
             }
             const userData = await backend.getUser(Principal.fromText(id));
+            const certificatesData = await backend.getCertifiesByPrincipal(Principal.fromText(id));
+            if (certificatesData.length != 0) {console.log(certificatesData[0].expirationDate)}
+            console.log(certificatesData)
 
 
-            const certificatesData = [
-                {
-                    id: 1,
-                    title: "Certificate 1",
-                    description: "Certificate 1 description",
-                    expeditionDate: 1717334400,
-                    expirationDate: 1717334400
-                }
-            ];
+            // const certificatesData = [
+            //     {
+            //         id: 1,
+            //         title: "Certificate 1",
+            //         description: "Certificate 1 description",
+            //         expeditionDate: 1717334400,
+            //         expirationDate: 1717334400
+            //     }
+            // ];
 
-            setUser(userData[0]);
+            if(userData.length != 0){setUser(userData[0])};
             setCertificates(certificatesData);
         } catch (error) {
             console.error('Error fetching user data:', error);
@@ -142,9 +145,13 @@ const UserDetail: React.FC = () => {
                                     <h4 className="font-medium text-lg mb-2">{certificate.title}</h4>
                                     <p className="text-gray-600 mb-2">{certificate.description}</p>
                                     <div className="text-sm text-gray-500">
-                                        <span>Issued: {formatDate(certificate.expeditionDate)}</span>
+                                        <span>Issued: {formatDate(Number(certificate.expeditionDate) / 1000000)}</span>
                                         {certificate.expirationDate && (
-                                            <span className="ml-4">Expires: {formatDate(certificate.expirationDate)}</span>
+                                            <span className="ml-4">Expires: 
+                                                {
+                                                    certificate.expirationDate.length != 0 ? formatDate(Number(certificate.expirationDate)):' No expire'
+                                                }
+                                            </span>
                                         )}
                                     </div>
                                 </div>

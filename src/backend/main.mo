@@ -5,7 +5,8 @@ import Principal "mo:base/Principal";
 import { now } "mo:base/Time";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
-import Random "mo:random/Rand"
+import Random "mo:random/Rand";
+import { print } "mo:base/Debug";
 shared ({caller = DEPLOYER}) actor class() {
 
   type User = Types.User;
@@ -100,11 +101,12 @@ shared ({caller = DEPLOYER}) actor class() {
   public shared ({ caller }) func certifyUser(user: Principal, certificate: Types.CertificateDataInit) : async () {
     assert(Map.has<Principal, User>(users, phash, user));
     assert(isAdmin(caller));
-    let {title; description; expirationDate } = certificate;
+    let {title; description; expirationDate; image } = certificate;
     lastCertificateId += 1;
     let newCertificate: Types.Certificate = {
       title;
       description;
+      image;
       expirationDate;
       id = lastCertificateId;
       owner = user;
@@ -122,6 +124,13 @@ shared ({caller = DEPLOYER}) actor class() {
 
 
 
+  };
+
+  public shared func getCertifiesByPrincipal(p: Principal): async [Types.Certificate]{
+    switch(Map.get<Principal, [Types.Certificate]>(certificates, phash, p)){
+      case null [];
+      case (?c) {c}
+    }
   };
 
   public shared ({ caller }) func editProfile(data : UserUpdatableData) : async {
@@ -172,7 +181,7 @@ shared ({caller = DEPLOYER}) actor class() {
   };
 
   public shared ({ caller }) func getUser(u: Principal): async ?User {
-    assert(isUser(caller));
+    // assert(isUser(caller));
     Map.get<Principal, User>(users, phash, u)
   };
 
@@ -254,7 +263,9 @@ shared ({caller = DEPLOYER}) actor class() {
           case (?user) user;
         };
         let bidsCounter = Map.size(task.bids);
-        let bidsDetails = if(caller == task.owner){Map.toArray(task.bids)} else { [] };
+        let bidsDetails = if(caller == task.owner){print("Hola");Map.toArray(task.bids)} else { print("Chau");[] };
+        print("caller: " # debug_show(caller));
+        print("owner Task: " # debug_show(task.owner));
         return ?{task = {task with bidsCounter};  author = user; bidsDetails};
       }
     };
@@ -348,6 +359,10 @@ shared ({caller = DEPLOYER}) actor class() {
     if(task.owner != caller ){
       return #Err("Caller is not the task owner");
     };
+    switch(task.assignedTo){
+      case null {};
+      case (_) { return #Err("Task is already assigned") };
+    };
 
     let offerAccepted =  Map.get<Principal, Types.Offer>(task.bids, phash, user);
     switch offerAccepted {
@@ -355,6 +370,7 @@ shared ({caller = DEPLOYER}) actor class() {
         return #Err ("User has not made an offer") 
       };
       case ( ?offer ) {
+        
         let updatedTask: Task = {
           task with
           assignedTo = ?user;

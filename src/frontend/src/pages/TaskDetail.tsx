@@ -15,45 +15,21 @@ const TaskDetail: React.FC = () => {
     const [author, setAuthor] = useState<User | null>(null)
     const [bids, setBids] = useState<[Principal, Offer][]>([])
     const [showMyBid, setShowMyBid] = useState(false);
-    const [showInfoAuthor, setShowInfoAuthor] = useState(false);
+    // const [showInfoAuthor, setShowInfoAuthor] = useState(false);
     const [amountBid, setAmountBid] = useState(BigInt(0));
     const navigate = useNavigate();
 
 
-    const fetchTask = async () => {
-
-        try {
-            setLoading(true);
-            if (!id) {
-                throw new Error('Task ID is required');
-            }
-            const taskData = await backend.expandTask(BigInt(id));
-            if (taskData[0]) {
-                setTask(taskData[0].task || null);
-                if (taskData[0]) {
-                    setAuthor(taskData[0].author)
-                    setBids(taskData[0].bidsDetails)
-                    setAmountBid(taskData[0].task.rewardRange[0])
-                }
-                console.log(bids)
-            }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch task');
-        } finally {
-            setLoading(false);
-
-        }
-    };
-
+    
     const getStatus = (status: TaskStatus) => {
         if ("ToDo" in status) { return "To Do" }
         if ("InProgress" in status) { return "In Progress" }
         if ("Done" in status) { return "Done" }
         if ("Assigned" in status) { return "Assigned" }
         if ("Cancelled" in status) { return "Cancelled" }
-
+        
     }
-
+    
     const handlePlaceBid = async () => {
         if (task) {
             const responsePlaceBid = await backend.applyForTask({ taskId: task.id, amount: BigInt(amountBid) });
@@ -65,10 +41,52 @@ const TaskDetail: React.FC = () => {
             }
         }
     }
+    
+    const hanbleAccepBid = async (bidder: Principal) => {
+        if ( id ){
+            const accepsResponse = await backend.acceptOffer(BigInt(id), bidder)
+            // alert(accepsResponse)
+            if("Ok" in accepsResponse){
+                alert("success")
+            } else if("Err" in accepsResponse){
+                alert(accepsResponse.Err)
 
+            }
+
+            
+        }
+
+    };
+    
     useEffect(() => {
-        fetchTask();
-    }, [id]);
+        
+        const fetchTask = async () => {
+    
+            try {
+                setLoading(true);
+                if (!id) {
+                    throw new Error('Task ID is required');
+                }
+                const taskData = await backend.expandTask(BigInt(id));
+                if (taskData[0]) {
+                    setTask(taskData[0].task || null);
+                    if (taskData[0]) {
+                        setAuthor(taskData[0].author)
+                        setBids(taskData[0].bidsDetails)
+                        setAmountBid(taskData[0].task.rewardRange[0])
+                    }
+                }
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch task');
+            } finally {
+                setLoading(false);
+    
+            }
+        };
+
+        fetchTask()    
+        
+    }, [id, backend]);
 
     if (loading) {
         return (
@@ -247,6 +265,12 @@ const TaskDetail: React.FC = () => {
                                                         <div className="text-lg font-semibold">
                                                             {offer.amount.toString()} USDC
                                                         </div>
+                                                        <button 
+                                                            className='button w-25'
+                                                            onClick={() => hanbleAccepBid(bidder)}
+                                                        >
+                                                            Accept
+                                                        </button>
                                                     </div>
                                                 </div>
                                             ))
@@ -302,7 +326,7 @@ const TaskDetail: React.FC = () => {
                             </div>
                         </div>
                         {/* Sacar esto hacia una page de perfil */}
-                        {showInfoAuthor && author && (
+                        {/* {showInfoAuthor && author && (
                             <div className='absolute top-100 right-100 bg-gray-300 p-4 rounded-lg shadow-md'>
                                 <p>Name: {author.name}</p>
                                 <p>Score: {author.score}</p>
@@ -319,7 +343,7 @@ const TaskDetail: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
-                        )}
+                        )} */}
 
                         {/* Bids Overview */}
                         <div className="bg-white rounded-xl shadow-sm p-6">
