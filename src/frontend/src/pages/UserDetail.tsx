@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import { Principal } from "@dfinity/principal"
 import { formatDate } from '../utils/dateUtils';
 import { Certificate, User } from '../declarations/backend/backend.did';
 import { useSession } from '../context/sessionContext';
@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 
 const UserDetail: React.FC = () => {
     const { id } = useParams();
-    //const { backend } = useSession();
+    const { backend } = useSession();
 
     const [user, setUser] = useState<any | null>(null);
     const [certificates, setCertificates] = useState<any[]>([]);
@@ -17,14 +17,12 @@ const UserDetail: React.FC = () => {
 
     const fetchData = async () => {
         try {
-            // TODO: Replace with actual API call
-            const userData = {
-                name: "Vitalik",
-                email: "vitalik@example.com",
-                avatar: "https://avatar.iran.liara.run/public/44",
-                verified: true,
-                score: 100
-            };
+            setLoading(true);
+            if (!id) {
+                throw new Error('user id is required');
+            }
+            const userData = await backend.getUser(Principal.fromText(id));
+
 
             const certificatesData = [
                 {
@@ -36,7 +34,7 @@ const UserDetail: React.FC = () => {
                 }
             ];
 
-            setUser(userData);
+            setUser(userData[0]);
             setCertificates(certificatesData);
         } catch (error) {
             console.error('Error fetching user data:', error);
@@ -83,16 +81,16 @@ const UserDetail: React.FC = () => {
                         <div className="relative w-32 h-32 mx-auto mb-4">
                             {user.avatar ? (
                                 <img
-                                    src={user.avatar}
+                                    src="https://avatar.iran.liara.run/public/41"
                                     alt={user.name}
                                     className="w-full h-full rounded-full object-cover"
                                 />
                             ) : (
-                                <div className="w-full h-full rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span className="text-4xl text-gray-400">
-                                        {user.name?.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
+                                <img
+                                    src="https://avatar.iran.liara.run/public/41"
+                                    alt={user.name}
+                                    className="w-full h-full rounded-full object-cover"
+                                />
                             )}
                         </div>
                         <h2 className="text-xl font-semibold mb-2">{user.name}</h2>
