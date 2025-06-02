@@ -4,11 +4,11 @@ import { useSession } from '../context/sessionContext';
 import { useState } from 'react';
 import { TaskExpand, User, Offer, TaskStatus } from '../declarations/backend/backend.did';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const TaskDetail: React.FC = () => {
     const { id } = useParams();
-    const { backend } = useSession();
+    const { backend, user, isAuthenticated } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [task, setTask] = useState<TaskExpand | null>(null);
@@ -17,7 +17,7 @@ const TaskDetail: React.FC = () => {
     const [showMyBid, setShowMyBid] = useState(false);
     const [showInfoAuthor, setShowInfoAuthor] = useState(false);
     const [amountBid, setAmountBid] = useState(BigInt(0));
-
+    const navigate = useNavigate();
 
 
     const fetchTask = async () => {
@@ -35,7 +35,7 @@ const TaskDetail: React.FC = () => {
                     setBids(taskData[0].bidsDetails)
                     setAmountBid(taskData[0].task.rewardRange[0])
                 }
-
+                console.log(bids)
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch task');
@@ -55,15 +55,15 @@ const TaskDetail: React.FC = () => {
     }
 
     const handlePlaceBid = async () => {
-        if(task){
-            const responsePlaceBid = await backend.applyForTask({ taskId: task.id, amount: BigInt(amountBid)});
-            if("Ok" in responsePlaceBid) {
+        if (task) {
+            const responsePlaceBid = await backend.applyForTask({ taskId: task.id, amount: BigInt(amountBid) });
+            if ("Ok" in responsePlaceBid) {
                 alert("success")
             };
-            if("Err" in responsePlaceBid){
+            if ("Err" in responsePlaceBid) {
                 alert(responsePlaceBid.Err)
             }
-        } 
+        }
     }
 
     useEffect(() => {
@@ -143,35 +143,35 @@ const TaskDetail: React.FC = () => {
                             {/* Contenedor relativo para posicionar el div flotante */}
                             <div className="relative">
                                 <button
-                                onClick={() => setShowMyBid(!showMyBid)}
-                                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                                    onClick={() => setShowMyBid(!showMyBid)}
+                                    className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                                 >
-                                Place Bid
+                                    Place Bid
                                 </button>
 
                                 {/* Div flotante absolutamente posicionado respecto al botón */}
                                 {showMyBid && (
-                                <div className="absolute h-50 w-50 right-0 bg-gray-400 rounded shadow-lg text-center flex flex-col items-center justify-center z-10">
-                                    <div className='h-10 w-40 bg-gray-500 rounded-full flex items-center justify-center mb-5'>
-                                        <input 
-                                            type="number"
-                                            onChange={(e) => setAmountBid(BigInt(e.target.value))}
-                                            className='w-24 text-center rounded-full px-2 py-1 text-gray-900
+                                    <div className="absolute h-50 w-50 right-0 bg-gray-400 rounded shadow-lg text-center flex flex-col items-center justify-center z-10">
+                                        <div className='h-10 w-40 bg-gray-500 rounded-full flex items-center justify-center mb-5'>
+                                            <input
+                                                type="number"
+                                                onChange={(e) => setAmountBid(BigInt(e.target.value))}
+                                                className='w-24 text-center rounded-full px-2 py-1 text-gray-900
                                             focus:outline-none 
                                             [&::-webkit-outer-spin-button]:appearance-none 
                                             [&::-webkit-inner-spin-button]:appearance-none 
-                                            [-moz-appearance:textfield]' 
-                                            placeholder={task.rewardRange[0].toString()}/>
-                                            
-                                        <span>USD</span>
+                                            [-moz-appearance:textfield]'
+                                                placeholder={task.rewardRange[0].toString()} />
+
+                                            <span>USD</span>
+                                        </div>
+                                        <span
+                                            onClick={handlePlaceBid}
+                                            className='bg-[#2244ff] rounded-full py-2 px-4 w-40 hover:bg-[#1122ff] cursor-pointer'
+                                        >
+                                            submit
+                                        </span>
                                     </div>
-                                    <span
-                                        onClick={handlePlaceBid}
-                                        className='bg-[#2244ff] rounded-full py-2 px-4 w-40 hover:bg-[#1122ff] cursor-pointer'
-                                    >
-                                        submit
-                                    </span>
-                                </div>
                                 )}
                             </div>
                         </div>
@@ -217,6 +217,75 @@ const TaskDetail: React.FC = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Bids Section */}
+                        {isAuthenticated && (
+                            <div className="bg-white rounded-xl shadow-sm p-6">
+                                <h2 className="text-xl font-semibold mb-4">Bids</h2>
+                                <div className="space-y-4">
+                                    {author?.principal.toString() === user?.principal.toString() ? (
+                                        // Author view - show all bids
+                                        bids.length > 0 ? (
+                                            console.log(bids),
+                                            bids.map(([bidder, offer], index) => (
+                                                <div key={index} className="border rounded-lg p-4 hover:bg-gray-50">
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div
+                                                                className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                                                                onClick={() => navigate(`/users/${bidder}`)}
+                                                            >
+                                                                <span className="text-lg">👤</span>
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-medium">{bidder.toString().slice(0, 8)}...</p>
+                                                                <p className="text-sm text-gray-500">
+                                                                    {new Date(Number(offer.date) / 1000000).toLocaleDateString()}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-lg font-semibold">
+                                                            {offer.amount.toString()} USDC
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-center py-4">No bids yet</p>
+                                        )
+                                    ) : (
+                                        // Non-author view - show only their bid if they have one
+
+                                        (() => {
+                                            const myBid = bids.find(([bidder]) => bidder.toString() === user?.principal.toString());
+                                            console.log(bids)
+                                            return myBid ? (
+                                                <div className="border rounded-lg p-4 bg-blue-50">
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center">
+                                                                <span className="text-lg">👤</span>
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-medium">Your Bid</p>
+                                                                <p className="text-sm text-gray-500">
+                                                                    {new Date(Number(myBid[1].date) / 1000000).toLocaleDateString()}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-lg font-semibold">
+                                                            {myBid[1].amount.toString()} USDC
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-500 text-center py-4">You haven't placed a bid yet</p>
+                                            );
+                                        })()
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column - Sidebar */}
@@ -225,10 +294,7 @@ const TaskDetail: React.FC = () => {
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <h2 className="text-xl font-semibold mb-4">About the Client</h2>
                             <div className="flex items-center gap-3 mb-4">
-                                <div 
-                                    className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
-                                    onClick={() => setShowInfoAuthor(!showInfoAuthor)}
-                                >
+                                <div className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer" onMouseDown={() => navigate(`/users/${author?.principal}`)}>
                                     <span className="text-xl">👤</span>
                                     <span>{author?.name}</span>
                                     {author?.score != BigInt(0) && <span className='ml-6'>Score {author?.score}</span>}

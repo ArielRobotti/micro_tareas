@@ -20,7 +20,7 @@ const MenuUser = () => {
   const handleVerify = async () => {
     console.log(code)
     const response = await backend.enterCodeVerification(BigInt(code))
-    if (response){
+    if (response) {
       alert("Your email has been verified successfully")
     }
   };
@@ -61,7 +61,7 @@ const MenuUser = () => {
         className={`absolute top-[5px] right-[2px] w-48 bg-gray-800/80 backdrop-blur-sm text-white rounded-lg shadow-xl transition-transform duration-300 origin-top transform
             ${showMenu ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"}`}
       >
-        <div onMouseDown={() => navigate("/dashboard")} className="flex items-center justify-between py-1 hover:bg-gray-500 hover:rounded-t-lg">
+        <div onMouseDown={() => navigate(`/users/${user?.principal}`)} className="flex items-center justify-between py-1 hover:bg-gray-500 hover:rounded-t-lg">
           <span className="block w-full text-left px-4 py-2">Profile {user?.name.split(" ")[0]}</span>
         </div>
 
@@ -89,50 +89,50 @@ const MenuUser = () => {
 
       {/* MODAL DE VERIFICACION */}
       {showModalVerify && (
-  <div
-    className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
-    onClick={() => setShowModalVerify(false)} // click en fondo cierra el modal
-  >
-    <div
-      className="relative bg-white p-6 rounded-lg shadow-xl text-black max-w-sm w-full"
-      onClick={(e) => e.stopPropagation()} // evita que el click dentro del modal lo cierre
-    >
-      {/* Botón X en la esquina */}
-      <h1
-        className="h-10 absolute top-0 right-4 text-gray-500 hover:text-gray-700 "
-        onClick={() => setShowModalVerify(false)}
-      >
-        ×
-      </h1>
-
-      <h2 className="text-lg font-semibold mb-4">Send me a code of verification</h2>
-
-      <div className="flex flex-row gap-4 justify-center">
         <div
-          className="mt-4 w-30 px-4 py-2 text-white rounded-full bg-blue-600 hover:bg-blue-500 text-center cursor-pointer"
-          onClick={handleGetCode}
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center"
+          onClick={() => setShowModalVerify(false)} // click en fondo cierra el modal
         >
-          Get Code
-        </div>
-      </div>
+          <div
+            className="relative bg-white p-6 rounded-lg shadow-xl text-black max-w-sm w-full"
+            onClick={(e) => e.stopPropagation()} // evita que el click dentro del modal lo cierre
+          >
+            {/* Botón X en la esquina */}
+            <h1
+              className="h-10 absolute top-0 right-4 text-gray-500 hover:text-gray-700 "
+              onClick={() => setShowModalVerify(false)}
+            >
+              ×
+            </h1>
 
-      <div className="mt-5 flex items-center justify-center gap-4">
-        <input
-          onChange={(e) => setCode(Number(e.target.value))}
-          className="h-10 w-48 border rounded-full px-4 text-center [&::-webkit-inner-spin-button]:appearance-none"
-          type="number"
-          placeholder="Enter Code"
-        />
-        <div
-          className="px-4 py-2 text-white rounded-full bg-blue-600 hover:bg-blue-500 text-center cursor-pointer"
-          onClick={handleVerify}
-        >
-          Verify
+            <h2 className="text-lg font-semibold mb-4">Send me a code of verification</h2>
+
+            <div className="flex flex-row gap-4 justify-center">
+              <div
+                className="mt-4 w-30 px-4 py-2 text-white rounded-full bg-blue-600 hover:bg-blue-500 text-center cursor-pointer"
+                onClick={handleGetCode}
+              >
+                Get Code
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-center gap-4">
+              <input
+                onChange={(e) => setCode(Number(e.target.value))}
+                className="h-10 w-48 border rounded-full px-4 text-center [&::-webkit-inner-spin-button]:appearance-none"
+                type="number"
+                placeholder="Enter Code"
+              />
+              <div
+                className="px-4 py-2 text-white rounded-full bg-blue-600 hover:bg-blue-500 text-center cursor-pointer"
+                onClick={handleVerify}
+              >
+                Verify
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 };

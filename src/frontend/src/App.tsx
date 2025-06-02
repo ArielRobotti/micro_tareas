@@ -1,7 +1,7 @@
 import { SessionProvider } from "./context/sessionContext";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-import { Dashboard, Feed, Home, BrowseTasks, HireFreelancer, TaskDetail } from "./pages";
+import { Dashboard, Feed, Home, BrowseTasks, HireFreelancer, TaskDetail, UserDetail } from "./pages";
 import './App.css';
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
               <Route path="/tasks" element={<BrowseTasks />} />
               <Route path="/tasks/:id" element={<TaskDetail />} />
               <Route path="/hire" element={<HireFreelancer />} />
+              <Route path="/users/:id" element={<UserDetail />} />
               <Route path="*" element={<Home />} />
             </Route>
           </Routes>
