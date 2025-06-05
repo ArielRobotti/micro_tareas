@@ -45,9 +45,9 @@ const NavBar = () => {
           {/* Placeholder SVG logo */}
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#22c55e" />
-            <text x="16" y="21" textAnchor="middle" fontSize="16" fill="white" fontWeight="bold">MT</text>
+            <text x="16" y="21" textAnchor="middle" fontSize="16" fill="white" fontWeight="bold">ITP</text>
           </svg>
-          <span className="text-lg sm:text-xl font-bold text-gray-800 whitespace-nowrap">Micro Tareas</span>
+          <span className="text-lg sm:text-xl font-bold text-gray-800 whitespace-nowrap">Infinity Task Protocol</span>
         </Link>
 
         {/* Mobile Menu Button */}

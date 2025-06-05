@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24.967871mm"
+   height="19.866642mm"
+   viewBox="0 0 24.967871 19.866642"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="LogoITP.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="6.2003367"
+     inkscape:cx="34.998099"
+     inkscape:cy="36.933478"
+     inkscape:window-width="1920"
+     inkscape:window-height="1048"
+     inkscape:window-x="0"
+     inkscape:window-y="1080"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <rect
+       x="240.96762"
+       y="424.11148"
+       width="78.228767"
+       height="56.061958"
+       id="rect62990" />
+    <rect
+       x="247.52425"
+       y="435.24237"
+       width="59.222046"
+       height="34.801361"
+       id="rect52154" />
+  </defs>
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-65.810399,-113.43922)">
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text52152"
+       style="font-size:33.3333px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect52154)" />
+    <text
+       xml:space="preserve"
+       transform="scale(0.26458333)"
+       id="text62988"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:33.3333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';white-space:pre;shape-inside:url(#rect62990)" />
+    <ellipse
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke-width:0.264583"
+       id="path83930-5"
+       cx="78.294334"
+       cy="123.37254"
+       rx="12.483935"
+       ry="9.933321" />
+    <ellipse
+       style="fill:#00ff0a;fill-opacity:1;fill-rule:evenodd;stroke-width:0.264583"
+       id="path83930"
+       ry="9.3381977"
+       rx="11.747838"
+       cy="122.70593"
+       cx="78.987724" />
+    <text
+       xml:space="preserve"
+       style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.1484px;line-height:1.25;font-family:KacstDigital;-inkscape-font-specification:'KacstDigital Bold Italic';stroke-width:0.264583"
+       x="70.100273"
+       y="124.42811"
+       id="text4346"
+       transform="scale(0.98235487,1.0179621)"><tspan
+         id="tspan4344"
+         style="font-style:italic;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.1484px;font-family:Yrsa;-inkscape-font-specification:'Yrsa Bold Italic';stroke-width:0.264583"
+         x="70.100273"
+         y="124.42811"
+         dy="0"
+         sodipodi:role="line">ITP</tspan></text>
+  </g>
+</svg>
