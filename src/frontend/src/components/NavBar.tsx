@@ -197,7 +197,7 @@ const NavBar = () => {
               </>
             )}
           </div>
-          <input
+          {/* <input
             type="text"
             required
             maxLength={10}
@@ -205,7 +205,7 @@ const NavBar = () => {
             className="ml-20 border p-2 w-[70%] mt-3 mb-3 rounded-full text-center appearance-none [-moz-appearance:_textfield] 
                 [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none 
                 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-          />
+          /> */}
 
           <div className="flex justify-between px-[30px]">
             <button

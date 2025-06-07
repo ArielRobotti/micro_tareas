@@ -107,11 +107,11 @@ const UserDetail: React.FC = () => {
                             {user?.principal.toString() === id && (
                                 <svg
                                     onClick={handleUploadImage}
-                                    width="18" 
-                                    height="18" 
-                                    viewBox="1 1 22 22" 
+                                    width="22" 
+                                    height="22" 
+                                    viewBox="0 0 24 24" 
                                     focusable="false" 
-                                    className="KkhfNb NMm5M absolute bottom-3 right-3  bg-opacity-50 rounded-full bg-white p-[2px]"
+                                    className="KkhfNb NMm5M absolute bottom-3 right-3  bg-opacity-50 rounded-full bg-white p-[2px] hover:fill-blue-600"
                                 >
                                     <path d="M20 5h-3.17L15 3H9L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 14H4V7h16v12zM12 9c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"></path>
                                 </svg>
