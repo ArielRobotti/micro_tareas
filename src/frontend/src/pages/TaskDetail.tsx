@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { TaskExpand, User, Offer, TaskStatus } from '../declarations/backend/backend.did';
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { blobToImageUrl } from '../utils/imageManager';
 
 const TaskDetail: React.FC = () => {
     const { id } = useParams();
@@ -319,7 +320,14 @@ const TaskDetail: React.FC = () => {
                             <h2 className="text-xl font-semibold mb-4">About the Client</h2>
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-60 h-12 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer" onMouseDown={() => navigate(`/users/${author?.principal}`)}>
-                                    <span className="text-xl">👤</span>
+                                    {author && 
+                                        (author.thumbnail.length != 0 ? 
+                                        <img 
+                                            src={blobToImageUrl(author.thumbnail[0]) as string | ""}
+                                            className='h-9 w-9 rounded-full object-cover mr-4'
+                                        /> : 
+                                        <span className="text-xl">👤</span>)
+                                    }
                                     <span>{author?.name}</span>
                                     {author?.score != BigInt(0) && <span className='ml-6'>Score {author?.score}</span>}
                                 </div>
