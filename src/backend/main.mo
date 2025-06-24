@@ -72,10 +72,7 @@ shared ({caller = DEPLOYER}) actor class() {
           user;
           notifications = getNotifications(caller);
           msgs = getMsgs(caller);
-          certificates = switch (Map.get<Principal, [Types.Certificate]>(certificates, phash, caller)){
-            case null [];
-            case (?c) c;
-          }
+          certificates = getCertifiesByPrincipal(caller);
         });
       };
     };
@@ -89,10 +86,7 @@ shared ({caller = DEPLOYER}) actor class() {
           user;
           notifications = getNotifications(caller);
           msgs = getMsgs(caller);
-          certificates = switch (Map.get<Principal, [Types.Certificate]>(certificates, phash, caller)){
-            case null [];
-            case (?c) c;
-          }
+          certificates = getCertifiesByPrincipal(caller);
         });
       };
     };
@@ -112,25 +106,28 @@ shared ({caller = DEPLOYER}) actor class() {
       owner = user;
       expeditionDate = now();
     };
-    let currentCertificates = switch(Map.get<Principal, [Types.Certificate]>(certificates, phash, user)){
-      case null [];
-      case (?c) c;
-    };
+    let currentCertificates = getCertifiesByPrincipal(caller);
     let updateCertificates = Array.tabulate<Types.Certificate>(
       currentCertificates.size() + 1,
       func x = if (x < currentCertificates.size()) { currentCertificates[x] } else { newCertificate }
     );
     ignore Map.put<Principal, [Types.Certificate]>(certificates, phash, user, updateCertificates);
-
-
-
   };
 
-  public shared func getCertifiesByPrincipal(p: Principal): async [Types.Certificate]{
+  func getCertifiesByPrincipal(p: Principal):  [Types.Certificate]{
     switch(Map.get<Principal, [Types.Certificate]>(certificates, phash, p)){
       case null [];
       case (?c) {c}
     }
+  };
+
+  public shared ({ caller }) func loadAvatar(avatar: Blob, thumbnail: Blob): async {#Ok; #Err: Text}{
+    let user = switch (Map.get<Principal, User>(users, phash, caller)) {
+      case null { return #Err("User not found") };
+      case (?user) { user };
+    };
+    ignore Map.put<Principal, User>(users, phash, caller, {user with avatar = ?avatar; thumbnail = ?thumbnail});
+    #Ok
   };
 
   public shared ({ caller }) func editProfile(data : UserUpdatableData) : async {
@@ -141,14 +138,13 @@ shared ({caller = DEPLOYER}) actor class() {
       case null { return #Err("User not found") };
       case (?user) { user };
     };
-    let { name; email; avatar } = data;
+    let { name; email } = data;
     let verified = (user.email == email) and (email != null); // En caso de que el usuario modifique su email tendrá que verificarlo nuevamente
     let updatedUser = {
       user with
       verified;
       name = switch (name) { case null user.name; case (?n) n };
       email = switch (email) { case null user.email; case e e };
-      avatar = switch (avatar) { case null user.avatar; case a a };
     };
     ignore Map.put<Principal, User>(users, phash, caller, updatedUser);
     #Ok(updatedUser);
@@ -180,9 +176,13 @@ shared ({caller = DEPLOYER}) actor class() {
     }
   };
 
-  public shared ({ caller }) func getUser(u: Principal): async ?User {
-    // assert(isUser(caller));
-    Map.get<Principal, User>(users, phash, u)
+  public shared query func getUser(u: Principal): async ?(User and {certificates: [Types.Certificate]}) {
+    switch (Map.get<Principal, User>(users, phash, u)){
+      case null null;
+      case ( ?user ){
+        ? {user with certificates = getCertifiesByPrincipal(u)}
+      }
+    }
   };
 
   ///////////////// Crud Tareas //////////////////
@@ -373,6 +373,7 @@ shared ({caller = DEPLOYER}) actor class() {
         
         let updatedTask: Task = {
           task with
+          status = #InProgress;
           assignedTo = ?user;
           finalAmount = ?(offer.amount);
           start = ?now();
@@ -386,9 +387,9 @@ shared ({caller = DEPLOYER}) actor class() {
 
   ///////////// private functions ///////////////
 
-  func isUser(p: Principal): Bool {
-    Map.has<Principal, User>(users, phash, p)
-  };
+  // func isUser(p: Principal): Bool {
+  //   Map.has<Principal, User>(users, phash, p)
+  // };
 
   func verifyCode(u: Principal, _code: Nat): Bool {
     switch (Map.remove<Principal, Nat>(verificationCodes, phash, u)){

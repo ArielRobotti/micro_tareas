@@ -8,6 +8,7 @@ module {
         principal : Principal;
         name : Text;
         avatar : ?Blob;
+        thumbnail: ?Blob;
         email : ?Text;
         verified : Bool;
         score : Nat;
@@ -17,7 +18,6 @@ module {
 
     public type UserUpdatableData = {
         name : ?Text;
-        avatar : ?Blob;
         email : ?Text;
     };
 
@@ -26,6 +26,7 @@ module {
             principal = Principal.fromText("2vxsx-fae");
             name = "";
             avatar = null;
+            thumbnail = null;
             email = null;
             verified = false;
             score = 0;

@@ -45,9 +45,9 @@ const NavBar = () => {
           {/* Placeholder SVG logo */}
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="32" height="32" rx="8" fill="#22c55e" />
-            <text x="16" y="21" textAnchor="middle" fontSize="16" fill="white" fontWeight="bold">MT</text>
+            <text x="16" y="21" textAnchor="middle" fontSize="16" fill="white" fontWeight="bold">ITP</text>
           </svg>
-          <span className="text-lg sm:text-xl font-bold text-gray-800 whitespace-nowrap">Micro Tareas</span>
+          <span className="text-lg sm:text-xl font-bold text-gray-800 whitespace-nowrap">Infinity Task Protocol</span>
         </Link>
 
         {/* Mobile Menu Button */}
@@ -197,7 +197,7 @@ const NavBar = () => {
               </>
             )}
           </div>
-          <input
+          {/* <input
             type="text"
             required
             maxLength={10}
@@ -205,7 +205,7 @@ const NavBar = () => {
             className="ml-20 border p-2 w-[70%] mt-3 mb-3 rounded-full text-center appearance-none [-moz-appearance:_textfield] 
                 [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none 
                 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-          />
+          /> */}
 
           <div className="flex justify-between px-[30px]">
             <button

@@ -86,6 +86,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
         setUser(response.Ok.user);
         setNotifications(response.Ok.notifications);
         setMsgs(response.Ok.msgs);
+        console.log(response.Ok.user)
       }
     }
     if (isAuthenticated) {
@@ -158,8 +159,8 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
   return (
     <SessionContext.Provider value={
       {
-        user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser, updateNotifications, updateUnreadMessages,
-        login: handleLoginClick, logout
+        user, notifications, msgs, identity, backend, isAuthenticated, loading, updateUser, 
+        updateNotifications, updateUnreadMessages, login: handleLoginClick, logout
       }
     }
     >

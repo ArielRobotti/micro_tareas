@@ -1,6 +1,7 @@
 {
   "canisters": {
     "backend": {
+      "specified_id": "gyjow-laaaa-aaaak-quh6q-cai",
       "main": "src/backend/main.mo",
       "type": "motoko",
       "declarations": {
@@ -8,6 +9,7 @@
       }
     },
     "frontend": {
+      "specified_id": "grkfk-5iaaa-aaaak-quh7a-cai",
       "source": [
         "src/frontend/dist"
       ],
