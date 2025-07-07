@@ -7,6 +7,23 @@
         "output": "./src/frontend/src/declarations/backend"
       }
     },
+    
+    "icp_ledger": {
+      "type": "pull",
+      "id": "ryjl3-tyaaa-aaaaa-aaaba-cai"
+    },
+
+    "treasury": {
+      "main": "src/treasury/treasury.mo",
+      "type": "motoko",
+      "declarations": {
+        "output": "./src/frontend/src/declarations/treasury"
+      },
+      "dependencies": [
+        "backend"
+      ]
+    },
+
     "frontend": {
       "source": [
         "src/frontend/dist"
@@ -25,5 +42,6 @@
     }
   },
   "output_env_file": ".env",
-  "version": 1
+  "version": 1,
+  "dfx": "0.25.1"
 }

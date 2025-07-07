@@ -71,9 +71,18 @@ module {
         #Err : Text;
     };
 
+    public type Asset = {
+        id: Nat;
+        withAccess: [Principal];
+        mimeType : Text;
+        data : Blob;
+    };
+
     public type TaskStatus = {
         #ToDo;
+        #Delivered;
         #InProgress;
+        #ReleasingPayment;
         #Cancelled;
         #Done;
     };
@@ -103,6 +112,7 @@ module {
     public type TaskPreview = {
         id : Nat;
         owner : Principal;
+        status : TaskStatus;
         title : Text;
         description : Text;
         keywords : [Text];
@@ -113,7 +123,9 @@ module {
 
     public type Task = TaskExpand and {
         bids : Map.Map<Principal, Offer>;
-        finalAmount : ?Nat;
+        finalAmount : Nat;
+        payed: Bool;
+        memoTransaction: ?Blob;
         start : ?Int;
     };
 
@@ -122,6 +134,7 @@ module {
         description : Text;
         rewardRange : (Nat, Nat);
     };
+    
     public func defaultTask() : Task {
         {
             id = 0;
@@ -132,7 +145,9 @@ module {
             bidsCounter = 0;
             createdAt = 0;
             description = "";
-            finalAmount = null;
+            finalAmount = 0;
+            payed = false;
+            memoTransaction = null;
             keywords = [];
             rewardRange = (0, 0);
             start = null;

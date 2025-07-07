@@ -1,9 +1,18 @@
 {
   "canisters": {
+    "ryjl3-tyaaa-aaaaa-aaaba-cai": {
+      "name": "icp_ledger",
+      "wasm_hash": "b51f9bd7a299f546a4254c2e4e61ef44571caf69cf697e50a5b166713d31595b",
+      "wasm_hash_download": "b51f9bd7a299f546a4254c2e4e61ef44571caf69cf697e50a5b166713d31595b",
+      "init_guide": "\n1. Create a 'minter' identity: dfx identity new minter\n2. Run the following multi-line command:\n\ndfx deps init ryjl3-tyaaa-aaaaa-aaaba-cai --argument \"(variant { \n    Init = record {\n        minting_account = \\\"$(dfx --identity minter ledger account-id)\\\";\n        initial_values = vec {};\n        send_whitelist = vec {};\n        transfer_fee = opt record { e8s = 10_000 : nat64; };\n        token_symbol = opt \\\"LICP\\\";\n        token_name = opt \\\"Local ICP\\\"; \n    }\n})\"\n",
+      "init_arg": null,
+      "candid_args": "(LedgerCanisterPayload)",
+      "gzip": true
+    },
     "rdmx6-jaaaa-aaaaa-aaadq-cai": {
       "name": "internet_identity",
-      "wasm_hash": "30ddd64ebfdf6a6430a398902d80ccb4007e2de5763cf52da7a809dda448d1df",
-      "wasm_hash_download": "30ddd64ebfdf6a6430a398902d80ccb4007e2de5763cf52da7a809dda448d1df",
+      "wasm_hash": "c4dd7fd20ad0ae82eb9c43cd2073df5a61f011d6a38df29eb6c07da3ddac3b1a",
+      "wasm_hash_download": "c4dd7fd20ad0ae82eb9c43cd2073df5a61f011d6a38df29eb6c07da3ddac3b1a",
       "init_guide": "Use '(null)' for sensible defaults. See the candid interface for more details.",
       "init_arg": "(opt record { captcha_config = opt record { max_unsolved_captchas= 50:nat64; captcha_trigger = variant {Static = variant {CaptchaDisabled}}}})",
       "candid_args": "(opt InternetIdentityInit)",
