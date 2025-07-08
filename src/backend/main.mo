@@ -13,6 +13,7 @@ import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Ledger "../interfaces/ICP_Token/ledger_icp";
 import TreasuryTypes "../treasury/types";
+import TalksTypes "../talks/types";
 shared ({caller = DEPLOYER}) actor class() {
 
   type User = Types.User;
@@ -42,7 +43,12 @@ shared ({caller = DEPLOYER}) actor class() {
     permilePart = 56 // 54 permile -> 5.6% ammount
   };
 
-  stable var treasury: Principal = Principal.fromText("2vxsx-fae");
+  ///////////// Canisters ids /////////////
+
+  stable var treasuryCanisterId: Principal = Principal.fromText("2vxsx-fae");
+  stable var talksCanisterId: Principal = Principal.fromText("2vxsx-fae"); 
+  
+  ////////////////////////////////////////
   let rand = Random.Rand();
 
   ///////////////// State variables ////////////////////////
@@ -83,8 +89,13 @@ shared ({caller = DEPLOYER}) actor class() {
   };
 
   public shared ({ caller }) func setTreasuryCanisterId(p: Principal): async () {
-    assert isAdmin(caller) and Principal.isAnonymous(treasury);
-    treasury := p;
+    assert isAdmin(caller) and Principal.isAnonymous(treasuryCanisterId);
+    treasuryCanisterId := p;
+  };
+
+  public shared ({ caller }) func setTalksCanisterId(p: Principal): async () {
+    assert isAdmin(caller) and Principal.isAnonymous(talksCanisterId);
+    talksCanisterId := p;
   };
 
   ////////////////// Admin functions /////////////////////
@@ -304,12 +315,14 @@ shared ({caller = DEPLOYER}) actor class() {
           case (?user) user;
         };
         let bidsCounter = Map.size(task.bids);
-        let bidsDetails = if(caller == task.owner){print("Hola");Map.toArray(task.bids)} else { print("Chau");[] };
-        print("caller: " # debug_show(caller));
-        print("owner Task: " # debug_show(task.owner));
+        let bidsDetails = if(caller == task.owner){Map.toArray(task.bids)} else {[]};
         return ?{task = {task with bidsCounter};  author = user; bidsDetails};
       }
     };
+  };
+
+  func getChatId(caller: Principal, users: [Principal], scopeId: ?TalksTypes.Scope): Nat32 {
+    TalksTypes.getTalkId(caller, users, scopeId)
   };
 
   public shared ({ caller }) func updateTask({id : Nat; data: Types.UpdatableDataTask}) : async { #Ok; #Err: Text } {
@@ -414,7 +427,7 @@ shared ({caller = DEPLOYER}) actor class() {
         let updatedTask: Task = {
           task with
           assignedTo = ?user;
-          status = #InProgress;
+          status = #InProgress(now());
           finalAmount = offer.amount;
           start = ?now();
           memoTransaction = ?newMemo();
@@ -426,7 +439,7 @@ shared ({caller = DEPLOYER}) actor class() {
           fee = null;
           from_subaccount = null;
           memo = updatedTask.memoTransaction;
-          to = {owner = treasury; subaccount = ?"escrows0000000000000000000000000"};
+          to = {owner = treasuryCanisterId; subaccount = ?"escrows0000000000000000000000000"};
         };
         ignore Map.put<Nat, Ledger.TransferArg>(transferArgsByTask, nhash, taskId, transferArg);
         return #Ok(transferArg);
@@ -454,7 +467,7 @@ shared ({caller = DEPLOYER}) actor class() {
         if (task.owner != caller) { 
           return #Err("Caller is not the task owner") 
         };
-        let toValidate = args.to == {owner = treasury; subaccount = ?"escrows0000000000000000000000000"};
+        let toValidate = args.to == {owner = treasuryCanisterId; subaccount = ?"escrows0000000000000000000000000"};
         let amountValidate = args.amount == task.finalAmount;
         if (not toValidate or not amountValidate) {
           return #Err("Error in trasfer args");
@@ -463,7 +476,7 @@ shared ({caller = DEPLOYER}) actor class() {
           case null { return #Err("Task not assigned") };
           case ( ?u ) { u };
         };
-        let treasuryCanister = actor(Principal.toText(treasury)): actor {
+        let treasuryCanister = actor(Principal.toText(treasuryCanisterId)): actor {
           createEscrow: shared (TreasuryTypes.CreateEscrowArgs) -> async {#Ok: Nat; #Err: Text };
         };
         let escrow = await treasuryCanister.createEscrow({
@@ -472,6 +485,20 @@ shared ({caller = DEPLOYER}) actor class() {
           transferArg = args; 
           token; userAssigned
         });
+
+        switch escrow {
+          case (#Ok(_)) { 
+            ignore Map.remove<Nat, Ledger.TransferArg>(transferArgsByTask, nhash, taskId);
+            ignore Map.put<Nat ,Task>(
+              activeTasks, 
+              nhash, 
+              taskId, 
+              // { task with chatId = ? getChatId(caller, [userAssigned], ?{name = "Task: "; id =  Nat.toText(taskId)})})
+              { task with chatId = ?981: ?Nat32})
+            
+            };
+          case (#Err(_)) { };
+        };
         // Freelancer push Notification
         pushNotification(
           userAssigned,
@@ -482,6 +509,7 @@ shared ({caller = DEPLOYER}) actor class() {
             read = false;
           }
         );
+        ////////////////////////////////
         escrow
       };
       case _ { return #Err("Task not found") };
@@ -505,30 +533,50 @@ shared ({caller = DEPLOYER}) actor class() {
         };
         ignore Map.put<Nat, Types.Asset>(assets, nhash, newAsset.id , newAsset);
         //// TODO: Crear type para entrega de tarea //////
-        ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, {task with status = #Delivered});
+
+        ////// Task Owner Push Notification ///////
+        pushNotification(
+          task.owner,
+          { 
+            date = now();
+            title = "Task delivered";
+            content = "Your task " # Nat.toText(task.id) # " has been delivered";
+            read = false;
+          }
+        );
+        ////////////////////////////////
+
+        ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, {task with status = #Delivered(now())});
         true;
       }
     }
   };
 
-  public shared ({ caller }) func acceptDelivery(taskId: Nat): async Bool {
+  public shared ({ caller }) func acceptDelivery(args: Types.AcceptedDeliveryArgs): async Bool {
+    let {taskId; qualification; review } = args;
     let task = Map.get<Nat, Task>(activeTasks, nhash, taskId);
     switch task {
       case null { return false };
       case ( ?task ) {
-        if (task.owner != caller or task.status != #Delivered) {
-          return false;
+        switch (task.status) {
+          case (#Delivered(_)) { 
+            if (task.owner != caller) {
+              return false;
+            };
+            ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, { 
+              task with status = #ReleasingPayment;  // prevent reentrancy effects
+            });
+            let treasuryCanister = actor(Principal.toText(treasuryCanisterId)): actor {
+              releaseEscrow: shared Nat -> async Bool;
+            };
+            let response = await treasuryCanister.releaseEscrow(taskId);
+            if (response) {
+              ignore Map.remove<Nat, Task>(activeTasks, nhash, taskId);
+              ignore Map.put<Nat, Task>(archivedTasks, nhash, taskId, {task with status = #Done(now())})
+            }
+          };
+          case (_) { return false}
         };
-        ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, { 
-          task with status = #ReleasingPayment;  // prevent reentrancy effects
-        });
-        let treasuryCanister = actor(Principal.toText(treasury)): actor {
-          releaseEscrow: shared Nat -> async Bool;
-        };
-        let response = await treasuryCanister.releaseEscrow(taskId);
-        if (response) {
-          ignore Map.put<Nat, Task>(activeTasks, nhash, taskId, {task with status = #Done})
-        }
       }
     };
     true

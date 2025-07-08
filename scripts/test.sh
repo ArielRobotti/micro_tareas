@@ -159,7 +159,11 @@ dfx canister call backend deliveryTask "(record {
 
 echo "✅ TaskOwner0 accept the task delivery from Freelancer1..."
 dfx identity use 0000TaskOwner
-dfx canister call backend acceptDelivery "(1)"
+dfx canister call backend acceptDelivery "(record { 
+  review = \"Text Review\"; 
+  taskId = 1 : nat; 
+  qualification = 10 : nat8 
+})"
 
 dfx identity use 0001Freelancer
 

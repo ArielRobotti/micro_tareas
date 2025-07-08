@@ -78,13 +78,14 @@ module {
         data : Blob;
     };
 
+    type Timestamp = Int;
     public type TaskStatus = {
-        #ToDo;
-        #Delivered;
-        #InProgress;
+        #ToDo: Timestamp;
+        #Delivered: Timestamp;
+        #InProgress: Timestamp;
         #ReleasingPayment;
-        #Cancelled;
-        #Done;
+        #Cancelled: Timestamp;
+        #Done: Timestamp;
     };
 
     public type TaskDataInit = {
@@ -107,6 +108,7 @@ module {
         status : TaskStatus;
         assignedTo : ?Principal;
         bidsCounter : Nat;
+        chatId: ?Nat32;
     };
 
     public type TaskPreview = {
@@ -127,6 +129,7 @@ module {
         payed: Bool;
         memoTransaction: ?Blob;
         start : ?Int;
+        chatId: ?Nat32;
     };
 
     public type UpdatableDataTask = {
@@ -135,6 +138,12 @@ module {
         rewardRange : (Nat, Nat);
     };
     
+    public type AcceptedDeliveryArgs = {
+        taskId: Nat;
+        qualification: Nat8;
+        review: Text;
+    };
+
     public func defaultTask() : Task {
         {
             id = 0;
@@ -151,8 +160,9 @@ module {
             keywords = [];
             rewardRange = (0, 0);
             start = null;
-            status = #ToDo;
+            status = #ToDo(0);
             title = "";
+            chatId = null;
         }
 
     }
