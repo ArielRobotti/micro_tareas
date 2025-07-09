@@ -5,7 +5,8 @@
       "type": "motoko",
       "declarations": {
         "output": "./src/frontend/src/declarations/backend"
-      }
+      },
+      "specified_id": "gyjow-laaaa-aaaak-quh6q-cai"
     },
     
     "icp_ledger": {
@@ -28,7 +29,8 @@
       "source": [
         "src/frontend/dist"
       ],
-      "type": "assets"
+      "type": "assets",
+      "specified_id": "grkfk-5iaaa-aaaak-quh7a-cai"
     },
     "internet_identity": {
       "type": "pull",
@@ -43,5 +45,5 @@
   },
   "output_env_file": ".env",
   "version": 1,
-  "dfx": "0.25.1"
+  "dfx": "0.27.0"
 }
